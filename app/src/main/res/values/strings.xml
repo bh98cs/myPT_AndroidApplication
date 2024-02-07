@@ -23,6 +23,7 @@
     <string name="progressTitle">Progress</string>
     <string name="previous_logs">Previous Logs</string>
     <string name="mypt">myPT</string>
+    <string name="start">START</string>
 
     <string-array name="Exercises">
         <item>All Exercises</item>

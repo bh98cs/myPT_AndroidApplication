@@ -1,13 +1,10 @@
 package daniel.southern.myptapplication;
 
-import static java.security.AccessController.getContext;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -138,9 +135,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int itemId = item.getItemId();
         //user clicked to record new exercise
         if (itemId == R.id.record) {
-             //TODO: Change to load StartRecordActivity
              Log.i(TAG, "Loading StartRecordActivity");
-            Intent intent = new Intent(MainActivity.this, PoseEstimationActivity.class);
+            Intent intent = new Intent(MainActivity.this, StartRecordActivity.class);
             startActivity(intent);
         }
         //user clicked to view progress
