@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "104466847160",
+    "project_id": "myptapplication-4db41",
+    "storage_bucket": "myptapplication-4db41.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:104466847160:android:68a1525c51248909152b4d",
+        "android_client_info": {
+          "package_name": "daniel.southern.myptapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxrdD__-HQFed36y1R0Ph8yjBPi4kZStI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
