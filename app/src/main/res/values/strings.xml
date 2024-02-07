@@ -14,9 +14,9 @@
     <string name="set_3Title">Set 3</string>
     <string name="sampleSetData">XX</string>
     <string name="sampleDateData">XX-XXX-XX</string>
-    <string name="weightTitle">Weight</string>
+    <string name="weightTitle">Weight:</string>
     <string name="sampleWeightData">XXkg</string>
-    <string name="notesTitle">Notes</string>
+    <string name="notesTitle">Notes:</string>
     <string name="lorem_ipsum">Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto.</string>
     <string name="homeTitle">Home</string>
     <string name="recordTitle">Record</string>
@@ -24,6 +24,9 @@
     <string name="previous_logs">Previous Logs</string>
     <string name="mypt">myPT</string>
     <string name="start">START</string>
+    <string name="exercise_type">Exercise Type</string>
+    <string name="enter_weight">Enter Weight:</string>
+    <string name="kg">kg</string>
 
     <string-array name="Exercises">
         <item>All Exercises</item>
