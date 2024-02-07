@@ -42,44 +42,76 @@
         android:id="@+id/textView_enterWeight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/enter_weight"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="64dp"
+        android:text="@string/weightTitle"
+        app:layout_constraintEnd_toStartOf="@+id/editText_weight"
         app:layout_constraintTop_toBottomOf="@+id/textView_currentDate" />
 
     <TextView
         android:id="@+id/textView_enterNotes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
         android:text="@string/notesTitle"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/editText_notes"
         app:layout_constraintTop_toBottomOf="@+id/textView_enterWeight" />
 
     <EditText
-        android:id="@+id/editTextNumberDecimal"
+        android:id="@+id/editText_weight"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:ems="10"
+        android:hint="@string/enter_weight"
         android:inputType="numberDecimal"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView_enterWeight"
-        app:layout_constraintStart_toEndOf="@+id/textView_enterWeight" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
+        android:id="@+id/textView_kg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/kg"
-        app:layout_constraintBaseline_toBaselineOf="@+id/editTextNumberDecimal"
-        app:layout_constraintStart_toEndOf="@+id/editTextNumberDecimal" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/editText_weight"
+        app:layout_constraintStart_toEndOf="@+id/editText_weight" />
 
     <EditText
         android:id="@+id/editText_notes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
+        android:hint="@string/enter_notes"
         android:inputType="textMultiLine"
         android:minHeight="48dp"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView_enterNotes"
-        app:layout_constraintStart_toEndOf="@+id/textView_enterNotes" />
-    <!-- TODO: Continue completing activity layout-->
+        app:layout_constraintEnd_toStartOf="@+id/textView_kg"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/editText_weight" />
+
+    <Button
+        android:id="@+id/button_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="128dp"
+        android:text="@string/save"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText_notes" />
+
+    <Button
+        android:id="@+id/button_discard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:theme="@style/ButtonBorder"
+        android:textColor="?attr/colorPrimary"
+        android:backgroundTint="?attr/colorSurface"
+        android:layout_marginTop="32dp"
+        android:text="@string/discard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_save" />
+
+
 
 
 

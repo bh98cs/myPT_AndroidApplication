@@ -25,8 +25,11 @@
     <string name="mypt">myPT</string>
     <string name="start">START</string>
     <string name="exercise_type">Exercise Type</string>
-    <string name="enter_weight">Enter Weight:</string>
+    <string name="enter_weight">Enter Weight</string>
     <string name="kg">kg</string>
+    <string name="save">SAVE</string>
+    <string name="discard">Discard</string>
+    <string name="enter_notes">Enter Notes</string>
 
     <string-array name="Exercises">
         <item>All Exercises</item>
