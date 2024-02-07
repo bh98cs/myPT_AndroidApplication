@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:elevation="4dp"
     android:background="?attr/colorPrimaryContainer">
 
     <RelativeLayout
@@ -14,13 +15,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_toEndOf="@id/suitcase_icon"
             android:text="@string/mypt"
-            android:textColor="?attr/colorOnPrimaryContainer"
-            android:textSize="34sp" />
-
-
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="34sp"
+            android:textColor="?attr/colorOnPrimaryContainer"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/suitcase_icon"
@@ -38,16 +38,15 @@
         </androidx.cardview.widget.CardView>
 
         <ImageView
-            android:id="@+id/imageView_logoutIcon"
+            android:id="@+id/imageView_homepageIcon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/logout_icon"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/home_icon"
             app:tint="?attr/colorOnPrimaryContainer" />
 
     </RelativeLayout>
-
 
 </androidx.appcompat.widget.Toolbar>
