@@ -2,6 +2,7 @@ package daniel.southern.myptapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -60,8 +61,10 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void discardExercise() {
-        //TODO: add code to discard exercise
+        //TODO: add code to confirm discard exercise
         Log.i(TAG, "Discard Exercise clicked.");
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void saveExercise() {
