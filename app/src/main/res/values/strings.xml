@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">MyPTApplication</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="password">Password:</string>
+    <string name="email">Email:</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="confirm_password">Confirm Password:</string>
+    <string name="create_account">Create Account</string>
+    <string name="login">Login</string>
+    <string name="cancel">Cancel</string>
+    <string name="dateTitle">Date</string>
+    <string name="set_1Title">Set 1</string>
+    <string name="set_2Title">Set 2</string>
+    <string name="set_3Title">Set 3</string>
+    <string name="sampleSetData">XX</string>
+    <string name="sampleDateData">XX-XXX-XX</string>
+    <string name="weightTitle">Weight</string>
+    <string name="sampleWeightData">XXkg</string>
+    <string name="notesTitle">Notes</string>
+    <string name="lorem_ipsum">Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto.</string>
+</resources>

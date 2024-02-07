@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/colorPrimaryContainer">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/suitcase_icon"
+            android:text="myPT"
+            android:textColor="?attr/colorOnPrimaryContainer"
+            android:textSize="34sp" />
+
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/suitcase_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="250dp"
+            >
+            <ImageView
+                android:id="@+id/imageView_suitcaseIcon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_centerVertical="true"
+                android:src="@mipmap/ic_launcher"
+                />
+        </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/imageView_logoutIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/logout_icon"
+
+            app:tint="?attr/colorOnPrimaryContainer" />
+    </RelativeLayout>
+
+
+</androidx.appcompat.widget.Toolbar>
