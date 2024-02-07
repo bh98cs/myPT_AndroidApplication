@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/home_icon"
+        android:title="@string/homeTitle"/>
+    <item
+        android:id="@+id/record"
+        android:icon="@drawable/record_icon"
+        android:title="@string/recordTitle"/>
+    <item
+        android:id="@+id/progress"
+        android:icon="@drawable/progress_icon"
+        android:title="@string/progressTitle"/>
+
+
+
+</menu>

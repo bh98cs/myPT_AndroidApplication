@@ -45,8 +45,8 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="16dp"
             android:src="@drawable/logout_icon"
-
             app:tint="?attr/colorOnPrimaryContainer" />
+
     </RelativeLayout>
 
 
