@@ -10,6 +10,7 @@ public class ExerciseLog {
     private int weight;
     private String notes;
 
+
     public ExerciseLog(){
         //empty constructor needed for Firebase
     }
@@ -53,4 +54,5 @@ public class ExerciseLog {
     public String getNotes() {
         return notes;
     }
+
 }

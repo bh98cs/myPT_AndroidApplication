@@ -123,7 +123,6 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void saveExercise() {
-        //TODO: add code to save exercise
         Log.i(TAG, "Save Exercise Clicked");
 
         //get current date

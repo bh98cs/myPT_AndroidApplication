@@ -14,9 +14,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -25,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseUser currentUser;
     private Toolbar toolbar;
     private ImageView logoutIcon;
+    private final FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private final CollectionReference exerciseLogsRef = database.collection("exerciseLogs");
+
 
     public static final String TAG = "MainActivity";
     @Override
@@ -88,11 +96,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setUpRecyclerView() {
         Log.i(TAG, "Setting up recycler view");
+        //TODO: May need to change if allowing user to signup through other accounts
+        Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail());
+
+        //set options for adapter
+        FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
+                ExerciseLog.class).build();
+
+        //create adapter
+        myAdapter = new MyAdapter(options);
         //create recycler view
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(myAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        myAdapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        myAdapter.stopListening();
     }
 
     @Override
