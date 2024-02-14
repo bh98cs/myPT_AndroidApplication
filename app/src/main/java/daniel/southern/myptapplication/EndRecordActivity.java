@@ -2,6 +2,7 @@ package daniel.southern.myptapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.ExperimentalGetImage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -49,6 +50,7 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
     private int set3;
     private String exerciseType;
 
+    @ExperimentalGetImage
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

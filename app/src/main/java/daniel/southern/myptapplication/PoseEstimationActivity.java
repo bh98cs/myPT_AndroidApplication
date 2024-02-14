@@ -29,7 +29,13 @@ import android.widget.CompoundButton;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import daniel.southern.myptapplication.posedetector.PoseDetectorProcessor;
+import daniel.southern.myptapplication.posedetector.classification.PoseClassifier;
+
 @ExperimentalGetImage
 public class PoseEstimationActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -47,7 +53,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
     private ImageAnalysis analysisUseCase;
     private GraphicOverlay graphicOverlay;
     @Nullable private Camera camera;
-    @Nullable private PoseDetectorProcessor imageProcessor;
+    @Nullable private PoseDetectorProcessor poseDetectorProcessor;
     private CameraSelector cameraSelector;
     private Chronometer timerView;
     private CompoundButton startStopTimer;
@@ -111,6 +117,9 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
                 }
                 //not checked so timer should stop
                 else{
+                    //TODO: Reset Pose estimation when timer is stopped - this will set reps count back to 0
+                    // save reps and rest time in local variable.
+                    // track the number of sets using local variable
                     Log.i(TAG, "Timer stop.");
                     //call method to stop timer
                     stopTimer();
@@ -121,7 +130,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
 
     private void bindAnalysisUseCase() {
         PoseDetectorOptions.Builder builder = new PoseDetectorOptions.Builder().setDetectorMode(PoseDetectorOptions.STREAM_MODE);
-        imageProcessor = new PoseDetectorProcessor(this, builder.build());
+        poseDetectorProcessor = new PoseDetectorProcessor(this, builder.build());
 
         ImageAnalysis.Builder builder2 = new ImageAnalysis.Builder();
         analysisUseCase = builder2.build();
@@ -129,7 +138,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         analysisUseCase.setAnalyzer(ContextCompat.getMainExecutor(this),
                 imageProxy -> {
                     graphicOverlay.setImageSourceInfo(imageProxy.getHeight(), imageProxy.getWidth());
-                    imageProcessor.processImageProxy(imageProxy, graphicOverlay);
+                    poseDetectorProcessor.processImageProxy(imageProxy, graphicOverlay);
                 });
 
         cameraProvider.bindToLifecycle(this, cameraSelector, analysisUseCase);
@@ -168,12 +177,16 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
     }
 
     private void endRecording() {
+
+        Map<String, Object> poseClassificationResult = poseDetectorProcessor.getPoseClassificationResult();
+
+
         Intent intent = new Intent(this, EndRecordActivity.class);
         //TODO: change so that data is not hardcoded
         int set1 = 6;
         int set2 = 6;
         int set3 = 6;
-        String exerciseType = "Push-Up";
+        String exerciseType = poseClassificationResult.get("exerciseType").toString();
 
         //intent data to EndRecordActivity to save to DB
         intent.putExtra(EXTRA_ITEM_EXERCISE_TYPE, exerciseType);

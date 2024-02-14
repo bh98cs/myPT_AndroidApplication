@@ -1,12 +1,10 @@
 package daniel.southern.myptapplication.posedetector;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageProxy;
 
@@ -20,7 +18,9 @@ import com.google.mlkit.vision.pose.PoseDetector;
 import com.google.mlkit.vision.pose.PoseDetectorOptionsBase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -31,21 +31,20 @@ import daniel.southern.myptapplication.posedetector.classification.PoseClassifie
 public class PoseDetectorProcessor {
 
     private static final String TAG = "PoseDetectorProcessor";
-
     private final PoseDetector detector;
-
     private final Context context;
     private final Executor classificationExecutor;
     private final ScopedExecutor executor;
     private boolean isShutdown;
+    private PoseWithClassification poseWithClassification;
 
     private PoseClassifierProcessor poseClassifierProcessor;
     protected static class PoseWithClassification {
 
         private final Pose pose;
-        private final List<String> classificationResult;
+        private final Map<String, Object> classificationResult;
 
-        public PoseWithClassification(Pose pose, List<String> classificationResult) {
+        public PoseWithClassification(Pose pose, Map<String, Object> classificationResult) {
             this.pose = pose;
             this.classificationResult = classificationResult;
         }
@@ -53,6 +52,7 @@ public class PoseDetectorProcessor {
         public Pose getPose() {
             return pose;
         }
+        public Map<String, Object> getClassificationResult(){return classificationResult;}
 
     }
 
@@ -70,6 +70,10 @@ public class PoseDetectorProcessor {
         detector.close();
     }
 
+    public Map<String, Object> getPoseClassificationResult(){
+        return poseWithClassification.getClassificationResult();
+    }
+
 
     protected Task<PoseWithClassification> detectInImage(MlImage image) {
         return detector
@@ -78,25 +82,36 @@ public class PoseDetectorProcessor {
                         classificationExecutor,
                         task -> {
                             Pose pose = task.getResult();
-                            List<String> classificationResult = new ArrayList<>();
+                            Map<String, Object> classificationResult = new HashMap<>();
 
                             if (poseClassifierProcessor == null) {
                                 poseClassifierProcessor = new PoseClassifierProcessor(context);
                             }
                             classificationResult = poseClassifierProcessor.getPoseResult(pose);
 
-                            return new PoseWithClassification(pose, classificationResult);
+                            poseWithClassification = new PoseWithClassification(pose, classificationResult);
+                            return poseWithClassification;
                         });
     }
 
     protected void onSuccess(
             @NonNull PoseWithClassification poseWithClassification,
             @NonNull GraphicOverlay graphicOverlay) {
+        List<String> classificationResultList = new ArrayList<>();
+        try{
+            String reps = poseWithClassification.classificationResult.get("reps").toString();
+            String exerciseType = poseWithClassification.classificationResult.get("exerciseType").toString();
+            classificationResultList.add(reps + " reps");
+            classificationResultList.add(exerciseType);
+        }
+        catch (NullPointerException e){
+        }
+
         graphicOverlay.add(
                 new PoseGraphic(
                         graphicOverlay,
                         poseWithClassification.pose,
-                        poseWithClassification.classificationResult));
+                        classificationResultList));
     }
 
     protected void onFailure(@NonNull Exception e) {

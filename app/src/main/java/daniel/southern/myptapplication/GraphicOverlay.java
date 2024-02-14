@@ -99,15 +99,6 @@ public class GraphicOverlay extends View {
         }
     }
 
-    /** Removes a graphic from the overlay. */
-    //TODO: Remove if this method is not needed
-/*    public void remove(Graphic graphic) {
-        synchronized (lock) {
-            graphics.remove(graphic);
-        }
-        postInvalidate();
-    }*/
-
     /**
      * Sets the source information of the image being processed by detectors, including size and
      * whether it is flipped, which informs how to transform image coordinates later.

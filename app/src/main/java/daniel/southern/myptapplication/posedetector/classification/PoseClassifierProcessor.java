@@ -15,8 +15,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
 public class PoseClassifierProcessor {
 
@@ -83,9 +84,10 @@ public class PoseClassifierProcessor {
          * 1: PoseClass : [0.0-1.0] confidence
          */
         @WorkerThread
-        public List<String> getPoseResult(Pose pose) {
+        public Map<String, Object> getPoseResult(Pose pose) {
+
             Preconditions.checkState(Looper.myLooper() != Looper.getMainLooper());
-            List<String> result = new ArrayList<>();
+            Map<String, Object> result = new HashMap<>();
             ClassificationResult classification = poseClassifier.classify(pose);
 
             // Feed pose to smoothing even if no pose found.
@@ -93,10 +95,9 @@ public class PoseClassifierProcessor {
 
             // Return early without updating repCounter if no pose found.
             if (pose.getAllPoseLandmarks().isEmpty()) {
-                result.add(lastRepResult);
+                result.put("reps", lastRepResult);
                 return result;
             }
-
             for (RepetitionCounter repCounter : repCounters) {
                 int repsBefore = repCounter.getNumRepeats();
                 int repsAfter = repCounter.addClassificationResult(classification);
@@ -104,24 +105,17 @@ public class PoseClassifierProcessor {
                     // Play a fun beep when rep counter updates.
                     ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
                     tg.startTone(ToneGenerator.TONE_PROP_BEEP);
-                    lastRepResult = String.format(
-                            Locale.US, "%s : %d reps", repCounter.getClassName(), repsAfter);
+                    lastRepResult = String.valueOf(repsAfter);
                     break;
                 }
             }
-            result.add(lastRepResult);
+            result.put("reps", lastRepResult);
 
 
             // Add maxConfidence class of current frame to result if pose is found.
             if (!pose.getAllPoseLandmarks().isEmpty()) {
                 String maxConfidenceClass = classification.getMaxConfidenceClass();
-                String maxConfidenceClassResult = String.format(
-                        Locale.US,
-                        "%s : %.2f confidence",
-                        maxConfidenceClass,
-                        classification.getClassConfidence(maxConfidenceClass)
-                                / poseClassifier.confidenceRange());
-                result.add(maxConfidenceClassResult);
+                result.put("exerciseType", maxConfidenceClass);
             }
 
             return result;
