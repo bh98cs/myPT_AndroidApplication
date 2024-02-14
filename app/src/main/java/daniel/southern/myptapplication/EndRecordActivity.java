@@ -31,10 +31,12 @@ import java.util.Map;
 
 public class EndRecordActivity extends AppCompatActivity implements View.OnClickListener{
     public static final String TAG = "EndRecordActivity";
+    //default value for sets
+    public static final int DEFAULT_SET_VALUE = 0;
     private TextView currentDate;
     private EditText weightInput;
     private EditText notesInput;
-    private TextView exerciseType;
+    private TextView exerciseTypeDisplay;
     private Button saveBtn;
     private Button discardBtn;
     private FirebaseAuth mAuth;
@@ -42,6 +44,11 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
     private FirebaseFirestore database = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference storageRef;
+    private int set1;
+    private int set2;
+    private int set3;
+    private String exerciseType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +62,23 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         //check user is logged in before proceeding
         updateUI(currentUser);
 
+        //get intent that started activity
+        Intent intent = getIntent();
+        //store data for sets
+        set1 = intent.getIntExtra(PoseEstimationActivity.EXTRA_ITEM_SET1, DEFAULT_SET_VALUE);
+        set2 = intent.getIntExtra(PoseEstimationActivity.EXTRA_ITEM_SET2, DEFAULT_SET_VALUE);
+        set3 = intent.getIntExtra(PoseEstimationActivity.EXTRA_ITEM_SET3, DEFAULT_SET_VALUE);
+        //store exercise type detected in previous activity
+        exerciseType = intent.getStringExtra(PoseEstimationActivity.EXTRA_ITEM_EXERCISE_TYPE);
+
+
         currentDate = findViewById(R.id.textView_currentDate);
         weightInput = findViewById(R.id.editText_weight);
         notesInput = findViewById(R.id.editText_notes);
+        exerciseTypeDisplay = findViewById(R.id.textView_exerciseType);
+
+        //set text view to show the exercise type detected in previous activity
+        exerciseTypeDisplay.setText(exerciseType);
 
         //set textview to show current date by calling method
         currentDate.setText(getTodayDate());
@@ -105,13 +126,11 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         //TODO: add code to save exercise
         Log.i(TAG, "Save Exercise Clicked");
 
-        //TODO: Change so that values are not hard coded.
-        String exerciseType = "Exercise Type";
+        //get current date
         String date = getTodayDate();
-        int set1 = 12;
-        int set2 = 12;
-        int set3 = 12;
+        //store user input for weight
         int weight = Integer.parseInt(weightInput.getText().toString());
+        //store user input for notes
         String notes = notesInput.getText().toString();
 
         //create Hashmap for upload to Document
