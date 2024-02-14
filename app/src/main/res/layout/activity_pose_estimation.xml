@@ -6,6 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".PoseEstimationActivity">
 
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/timerControlPanel"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <daniel.southern.myptapplication.GraphicOverlay
+        android:id="@+id/graphicOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/previewView"
+        app:layout_constraintEnd_toEndOf="@+id/previewView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/previewView" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/timerControlPanel"
         android:layout_width="match_parent"

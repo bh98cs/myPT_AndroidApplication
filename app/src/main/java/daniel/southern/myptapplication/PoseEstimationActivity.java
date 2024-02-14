@@ -1,8 +1,23 @@
 package daniel.southern.myptapplication;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.Camera;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ExperimentalGetImage;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -11,21 +26,72 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions;
+
+import daniel.southern.myptapplication.posedetector.PoseDetectorProcessor;
+@ExperimentalGetImage
 public class PoseEstimationActivity extends AppCompatActivity implements View.OnClickListener{
 
     public static final String EXTRA_ITEM_SET1 = "daniel.southern.myptapplication.EXTRA_ITEM_SET1";
     public static final String EXTRA_ITEM_SET2 = "daniel.southern.myptapplication.EXTRA_ITEM_SET2";
     public static final String EXTRA_ITEM_SET3 = "daniel.southern.myptapplication.EXTRA_ITEM_SET3";
     public static final String EXTRA_ITEM_EXERCISE_TYPE = "daniel.southern.myptapplication.EXTRA_ITEM_EXERCISE_TYPE";
+
     public static final String TAG = "PoseEstimationActivity";
+    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    @Nullable
+    private ProcessCameraProvider cameraProvider;
+    private PreviewView previewView;
+    @Nullable private Preview previewUseCase;
+    private ImageAnalysis analysisUseCase;
+    private GraphicOverlay graphicOverlay;
+    @Nullable private Camera camera;
+    @Nullable private PoseDetectorProcessor imageProcessor;
+    private CameraSelector cameraSelector;
     private Chronometer timerView;
     private CompoundButton startStopTimer;
     private Button endBtn;
+
+    private ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Log.i(TAG, "Permission granted");
+
+                } else {
+                    Log.w(TAG, "Permission Denied.");
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pose_estimation);
+
+        cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
+
+        previewView = findViewById(R.id.previewView);
+        graphicOverlay = findViewById(R.id.graphicOverlay);
+
+        new ViewModelProvider((ViewModelStoreOwner) this, (ViewModelProvider.Factory) ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()))
+                .get(CameraXViewModel.class)
+                .getProcessCameraProvider()
+                .observe(
+                        this,
+                        provider -> {
+                            cameraProvider = provider;
+                            bindPreviewUseCase();
+                            bindAnalysisUseCase();
+                        });
+
+        if (ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED) {
+        } else{
+            Log.w(TAG, "Permission not granted.");
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+
 
         timerView = findViewById(R.id.timerView);
         startStopTimer = findViewById(R.id.toggleTimerButton);
@@ -51,6 +117,35 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
                 }
             }
         });
+    }
+
+    private void bindAnalysisUseCase() {
+        PoseDetectorOptions.Builder builder = new PoseDetectorOptions.Builder().setDetectorMode(PoseDetectorOptions.STREAM_MODE);
+        imageProcessor = new PoseDetectorProcessor(this, builder.build());
+
+        ImageAnalysis.Builder builder2 = new ImageAnalysis.Builder();
+        analysisUseCase = builder2.build();
+
+        analysisUseCase.setAnalyzer(ContextCompat.getMainExecutor(this),
+                imageProxy -> {
+                    graphicOverlay.setImageSourceInfo(imageProxy.getHeight(), imageProxy.getWidth());
+                    imageProcessor.processImageProxy(imageProxy, graphicOverlay);
+                });
+
+        cameraProvider.bindToLifecycle(this, cameraSelector, analysisUseCase);
+    }
+
+    private void bindPreviewUseCase() {
+        if (previewUseCase != null) {
+            cameraProvider.unbind(previewUseCase);
+        }
+
+        Preview.Builder builder = new Preview.Builder();
+
+        previewUseCase = builder.build();
+        previewUseCase.setSurfaceProvider(previewView.getSurfaceProvider());
+        camera =
+                cameraProvider.bindToLifecycle(/* lifecycleOwner= */ this, cameraSelector, previewUseCase);
     }
 
     //method to stop timer
