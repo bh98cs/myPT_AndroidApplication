@@ -1,5 +1,6 @@
 package daniel.southern.myptapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -9,29 +10,54 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Firebase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class EndRecordActivity extends AppCompatActivity implements View.OnClickListener{
-    //TODO: Continue to implement code for this activity
     public static final String TAG = "EndRecordActivity";
     private TextView currentDate;
-    private EditText weight;
-    private EditText notes;
+    private EditText weightInput;
+    private EditText notesInput;
     private TextView exerciseType;
     private Button saveBtn;
     private Button discardBtn;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_end_record);
 
+        //initialise Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        //retrieve current user to check if they're already logged in
+        currentUser = mAuth.getCurrentUser();
+        //check user is logged in before proceeding
+        updateUI(currentUser);
+
         currentDate = findViewById(R.id.textView_currentDate);
-        weight = findViewById(R.id.editText_weight);
-        notes = findViewById(R.id.editText_notes);
+        weightInput = findViewById(R.id.editText_weight);
+        notesInput = findViewById(R.id.editText_notes);
 
         //set textview to show current date by calling method
         currentDate.setText(getTodayDate());
@@ -40,6 +66,14 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         saveBtn.setOnClickListener(this);
         discardBtn = findViewById(R.id.button_discard);
         discardBtn.setOnClickListener(this);
+    }
+
+    private void updateUI(FirebaseUser currentUser) {
+        //send user to login page if not already logged in
+        if(currentUser == null){
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
     }
 
     private String getTodayDate() {
@@ -70,5 +104,52 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
     private void saveExercise() {
         //TODO: add code to save exercise
         Log.i(TAG, "Save Exercise Clicked");
+
+        //TODO: Change so that values are not hard coded.
+        String exerciseType = "Exercise Type";
+        String date = getTodayDate();
+        int set1 = 12;
+        int set2 = 12;
+        int set3 = 12;
+        int weight = Integer.parseInt(weightInput.getText().toString());
+        String notes = notesInput.getText().toString();
+
+        //create Hashmap for upload to Document
+        Map<String, Object> exerciseLog = new HashMap<>();
+        exerciseLog.put("exerciseType", exerciseType);
+        exerciseLog.put("date", date);
+        exerciseLog.put("set1", set1);
+        exerciseLog.put("set2", set2);
+        exerciseLog.put("set3", set3);
+        exerciseLog.put("weight", weight);
+        exerciseLog.put("notes", notes);
+        //TODO: potentially need to change this when allowing other types of accounts
+        exerciseLog.put("user", currentUser.getEmail());
+
+        //add new document with generated ID
+        database.collection("exerciseLogs")
+                .add(exerciseLog)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        //successfully added new exercise log
+                        Log.i(TAG, "onSuccess: exerciseLog uploaded to database.");
+                        //provide user feedback that exercise has been uploaded
+                        Toast.makeText(EndRecordActivity.this, "New Exercise Saved!", Toast.LENGTH_SHORT).show();
+                        //return back to main activity to view all Items
+                        Intent intent = new Intent(EndRecordActivity.this, MainActivity.class);
+                        startActivity(intent);
+
+                    }
+
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                        //user feedback to advise was unable to save new item
+                        Toast.makeText(EndRecordActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
