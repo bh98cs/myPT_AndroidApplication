@@ -15,10 +15,7 @@ import daniel.southern.myptapplication.GraphicOverlay;
 public class PoseGraphic extends GraphicOverlay.Graphic {
 
     private static final float STROKE_WIDTH = 10.0f;
-    //private static final float POSE_CLASSIFICATION_TEXT_SIZE = 60.0f;
-    //private final List<String> poseClassification;
     private final Pose pose;
-    //private final Paint classificationTextPaint;
     private final Paint whitePaint;
 
     PoseGraphic(
