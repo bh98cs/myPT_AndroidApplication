@@ -28,6 +28,7 @@ import android.widget.CompoundButton;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions;
+import com.google.protobuf.StringValue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +59,9 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
     private Chronometer timerView;
     private CompoundButton startStopTimer;
     private Button endBtn;
+    private int numSets = 0;
+    private int[] reps = new int[3];
+
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -117,10 +121,8 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
                 }
                 //not checked so timer should stop
                 else{
-                    //TODO: Reset Pose estimation when timer is stopped - this will set reps count back to 0
-                    // save reps and rest time in local variable.
-                    // track the number of sets using local variable
                     Log.i(TAG, "Timer stop.");
+                    calculateRepsForSet();
                     //call method to stop timer
                     stopTimer();
                 }
@@ -176,23 +178,53 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         }
     }
 
+    private void calculateRepsForSet(){
+        int totalReps;
+        try{
+        //get number of reps performed, needs to be cast to a string and then cast to an integer
+         totalReps = Integer.parseInt(String.valueOf(poseDetectorProcessor.getPoseClassificationResult()
+                .get("reps")));
+        }
+        catch(NumberFormatException e){
+            //set
+            totalReps = 0;
+        }
+
+        if(numSets > 0){
+            //for loop to go through all entries in reps array
+            for(int i = 0; i < numSets; i++){
+                //subtract previously saved reps from save reps variable
+                //the saveReps variable is the TOTAL reps performed, this is how we
+                // calculate the number of reps performed in this set
+                totalReps -= reps[i];
+            }
+        }
+        Log.i(TAG, "Saving " + totalReps + " reps for set " + numSets);
+        //save the number of reps in array
+        reps[numSets] = totalReps;
+        //increment number of sets performed
+        numSets++;
+        if(numSets >= 2){
+            //disable the timer button as maximum number of sets has been reached
+            startStopTimer.setEnabled(false);
+        }
+    }
+
     private void endRecording() {
+        //save reps for the last set performed
+        calculateRepsForSet();
 
         Map<String, Object> poseClassificationResult = poseDetectorProcessor.getPoseClassificationResult();
 
-
         Intent intent = new Intent(this, EndRecordActivity.class);
-        //TODO: change so that data is not hardcoded
-        int set1 = 6;
-        int set2 = 6;
-        int set3 = 6;
         String exerciseType = poseClassificationResult.get("exerciseType").toString();
 
         //intent data to EndRecordActivity to save to DB
         intent.putExtra(EXTRA_ITEM_EXERCISE_TYPE, exerciseType);
-        intent.putExtra(EXTRA_ITEM_SET1, set1);
-        intent.putExtra(EXTRA_ITEM_SET2, set2);
-        intent.putExtra(EXTRA_ITEM_SET3, set3);
+        //TODO: intent data as an array if possible
+        intent.putExtra(EXTRA_ITEM_SET1, reps[0]);
+        intent.putExtra(EXTRA_ITEM_SET2, reps[1]);
+        intent.putExtra(EXTRA_ITEM_SET3, reps[2]);
         //send user to EndRecordActivity
         startActivity(intent);
     }

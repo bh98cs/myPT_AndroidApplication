@@ -126,11 +126,17 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
 
     private void saveExercise() {
         Log.i(TAG, "Save Exercise Clicked");
-
+        int weight;
         //get current date
         String date = getTodayDate();
+        try{
         //store user input for weight
-        int weight = Integer.parseInt(weightInput.getText().toString());
+        weight = Integer.parseInt(weightInput.getText().toString());
+        }catch(NumberFormatException e){
+            //no weight was given therefore string is empty, set weight to 0
+            weight = 0;
+        }
+
         //store user input for notes
         String notes = notesInput.getText().toString();
 
