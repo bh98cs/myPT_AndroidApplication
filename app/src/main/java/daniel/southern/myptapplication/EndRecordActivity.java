@@ -32,8 +32,6 @@ import java.util.Map;
 
 public class EndRecordActivity extends AppCompatActivity implements View.OnClickListener{
     public static final String TAG = "EndRecordActivity";
-    //default value for sets
-    public static final int DEFAULT_SET_VALUE = 0;
     private TextView currentDate;
     private EditText weightInput;
     private EditText notesInput;
@@ -45,9 +43,7 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
     private FirebaseFirestore database = FirebaseFirestore.getInstance();
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference storageRef;
-    private int set1;
-    private int set2;
-    private int set3;
+    private int[] reps = new int[3];
     private String exerciseType;
 
     @ExperimentalGetImage
@@ -66,10 +62,8 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
 
         //get intent that started activity
         Intent intent = getIntent();
-        //store data for sets
-        set1 = intent.getIntExtra(PoseEstimationActivity.EXTRA_ITEM_SET1, DEFAULT_SET_VALUE);
-        set2 = intent.getIntExtra(PoseEstimationActivity.EXTRA_ITEM_SET2, DEFAULT_SET_VALUE);
-        set3 = intent.getIntExtra(PoseEstimationActivity.EXTRA_ITEM_SET3, DEFAULT_SET_VALUE);
+        //store data for repetitions of exercise
+        reps = intent.getIntArrayExtra(PoseEstimationActivity.EXTRA_ITEM_REPS);
         //store exercise type detected in previous activity
         exerciseType = intent.getStringExtra(PoseEstimationActivity.EXTRA_ITEM_EXERCISE_TYPE);
 
@@ -144,9 +138,9 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         Map<String, Object> exerciseLog = new HashMap<>();
         exerciseLog.put("exerciseType", exerciseType);
         exerciseLog.put("date", date);
-        exerciseLog.put("set1", set1);
-        exerciseLog.put("set2", set2);
-        exerciseLog.put("set3", set3);
+        exerciseLog.put("set1", reps[0]);
+        exerciseLog.put("set2", reps[1]);
+        exerciseLog.put("set3", reps[2]);
         exerciseLog.put("weight", weight);
         exerciseLog.put("notes", notes);
         //TODO: potentially need to change this when allowing other types of accounts

@@ -40,9 +40,7 @@ import daniel.southern.myptapplication.posedetector.classification.PoseClassifie
 @ExperimentalGetImage
 public class PoseEstimationActivity extends AppCompatActivity implements View.OnClickListener{
 
-    public static final String EXTRA_ITEM_SET1 = "daniel.southern.myptapplication.EXTRA_ITEM_SET1";
-    public static final String EXTRA_ITEM_SET2 = "daniel.southern.myptapplication.EXTRA_ITEM_SET2";
-    public static final String EXTRA_ITEM_SET3 = "daniel.southern.myptapplication.EXTRA_ITEM_SET3";
+    public static final String EXTRA_ITEM_REPS = "daniel.southern.myptapplication.EXTRA_ITEM_REPS";
     public static final String EXTRA_ITEM_EXERCISE_TYPE = "daniel.southern.myptapplication.EXTRA_ITEM_EXERCISE_TYPE";
 
     public static final String TAG = "PoseEstimationActivity";
@@ -221,10 +219,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
 
         //intent data to EndRecordActivity to save to DB
         intent.putExtra(EXTRA_ITEM_EXERCISE_TYPE, exerciseType);
-        //TODO: intent data as an array if possible
-        intent.putExtra(EXTRA_ITEM_SET1, reps[0]);
-        intent.putExtra(EXTRA_ITEM_SET2, reps[1]);
-        intent.putExtra(EXTRA_ITEM_SET3, reps[2]);
+        intent.putExtra(EXTRA_ITEM_REPS, reps);
         //send user to EndRecordActivity
         startActivity(intent);
     }
