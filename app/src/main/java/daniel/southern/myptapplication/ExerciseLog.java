@@ -9,6 +9,7 @@ public class ExerciseLog {
     private int set3;
     private int weight;
     private String notes;
+    private String user;
 
 
     public ExerciseLog(){
@@ -54,5 +55,6 @@ public class ExerciseLog {
     public String getNotes() {
         return notes;
     }
+    public String getUser(){return user;}
 
 }

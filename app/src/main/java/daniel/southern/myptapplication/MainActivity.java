@@ -15,10 +15,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,6 +32,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -37,10 +41,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseUser currentUser;
     private Toolbar toolbar;
     private ImageView logoutIcon;
+    private Spinner spinner_selectedExercise;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
     private final CollectionReference exerciseLogsRef = database.collection("exerciseLogs");
     //array list to hold the exercises this user has saved data for
     private ArrayList<String> exercises = new ArrayList<>();
+    private String[] exercisesArray;
 
     public static final String TAG = "MainActivity";
     @Override
@@ -59,26 +65,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
 
         //initialise spinner
-        Spinner spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
+        spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
 
+        //initialise array for spinner options
         initList();
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, exercises);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        spinner_selectedExercise.setAdapter(arrayAdapter);
-        spinner_selectedExercise.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //retrieve exercise selected from the spinner
-                String selectedItem = parent.getItemAtPosition(position).toString();
-                Log.i(TAG, "Showing Exercises for " + selectedItem);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         // set tool bar as the action bar
         toolbar = findViewById(R.id.toolbar);
@@ -105,6 +95,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 })
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        //convert the ArrayList to an Array so that it can be used by ArrayAdapter
+                        exercisesArray = new String[exercises.size()];
+                        for(int i = 0; i < exercises.size(); i++){
+                            exercisesArray[i] = exercises.get(i);
+                            Log.i(TAG, exercises.get(i) + " added to array");
+
+                            //array for spinner options has been retrieved, now set the adapter for the spinner
+                            setUpSpinner();
+                        }
+                    }
+                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -112,6 +116,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
+    }
+
+    private void setUpSpinner() {
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, exercisesArray);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        spinner_selectedExercise.setAdapter(arrayAdapter);
+        spinner_selectedExercise.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //retrieve exercise selected from the spinner
+                String selectedItem = (String)parent.getSelectedItem();
+                Log.i(TAG, "Showing Exercises for " + selectedItem);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Log.i(TAG, "Nothing Selected");
+            }
+        });
     }
 
     private void updateUI(FirebaseUser currentUser) {
@@ -130,7 +152,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setUpRecyclerView() {
         Log.i(TAG, "Setting up recycler view");
         //TODO: May need to change if allowing user to signup through other accounts
-        Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail());
+        Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
+                .whereEqualTo("exerciseType", "squats_up");
 
         //set options for adapter
         FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
