@@ -110,8 +110,7 @@ public class PoseDetectorProcessor {
         graphicOverlay.add(
                 new PoseGraphic(
                         graphicOverlay,
-                        poseWithClassification.pose,
-                        classificationResultList));
+                        poseWithClassification.pose));
     }
 
     protected void onFailure(@NonNull Exception e) {

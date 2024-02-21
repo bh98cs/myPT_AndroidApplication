@@ -15,24 +15,17 @@ import daniel.southern.myptapplication.GraphicOverlay;
 public class PoseGraphic extends GraphicOverlay.Graphic {
 
     private static final float STROKE_WIDTH = 10.0f;
-    private static final float POSE_CLASSIFICATION_TEXT_SIZE = 60.0f;
-    private final List<String> poseClassification;
+    //private static final float POSE_CLASSIFICATION_TEXT_SIZE = 60.0f;
+    //private final List<String> poseClassification;
     private final Pose pose;
-    private final Paint classificationTextPaint;
+    //private final Paint classificationTextPaint;
     private final Paint whitePaint;
 
     PoseGraphic(
             GraphicOverlay overlay,
-            Pose pose,
-            List<String> poseClassification) {
+            Pose pose) {
         super(overlay);
         this.pose = pose;
-
-        this.poseClassification = poseClassification;
-        classificationTextPaint = new Paint();
-        classificationTextPaint.setColor(Color.WHITE);
-        classificationTextPaint.setTextSize(POSE_CLASSIFICATION_TEXT_SIZE);
-        classificationTextPaint.setShadowLayer(5.0f, 0f, 0f, Color.BLACK);
 
         whitePaint = new Paint();
         whitePaint.setStrokeWidth(STROKE_WIDTH);
@@ -44,16 +37,6 @@ public class PoseGraphic extends GraphicOverlay.Graphic {
         List<PoseLandmark> landmarks = pose.getAllPoseLandmarks();
         if (landmarks.isEmpty()) {
             return;
-        }
-
-        // Draw pose classification text.
-        float classificationX = POSE_CLASSIFICATION_TEXT_SIZE * 0.5f;
-        for (int i = 0; i < poseClassification.size(); i++) {
-            float classificationY =
-                    (canvas.getHeight()
-                            - POSE_CLASSIFICATION_TEXT_SIZE * 1.5f * (poseClassification.size() - i));
-            canvas.drawText(
-                    poseClassification.get(i), classificationX, classificationY, classificationTextPaint);
         }
 
         PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
