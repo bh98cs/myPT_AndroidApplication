@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions;
@@ -40,6 +41,8 @@ import daniel.southern.myptapplication.posedetector.classification.PoseClassifie
 @ExperimentalGetImage
 public class PoseEstimationActivity extends AppCompatActivity implements View.OnClickListener{
 
+    //TODO: look into how reps and sets can be displayed on screen -- I think  you will need to revert back
+    // to using the graphic overlay -- look at how this can be styled better
     public static final String EXTRA_ITEM_REPS = "daniel.southern.myptapplication.EXTRA_ITEM_REPS";
     public static final String EXTRA_ITEM_EXERCISE_TYPE = "daniel.southern.myptapplication.EXTRA_ITEM_EXERCISE_TYPE";
 
@@ -57,6 +60,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
     private Chronometer timerView;
     private CompoundButton startStopTimer;
     private Button endBtn;
+    private TextView textViewSetCount;
     private int numSets = 0;
     private int[] reps = new int[3];
 
@@ -100,6 +104,11 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
             requestPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
 
+
+        textViewSetCount = findViewById(R.id.textView_setCount);
+
+        //set set counter to 1 initially
+        textViewSetCount.setText("1");
 
         timerView = findViewById(R.id.timerView);
         startStopTimer = findViewById(R.id.toggleTimerButton);
@@ -184,7 +193,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
                 .get("reps")));
         }
         catch(NumberFormatException e){
-            //set
+            //set number of reps to 0 if no data for reps is given
             totalReps = 0;
         }
 
@@ -202,6 +211,8 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         reps[numSets] = totalReps;
         //increment number of sets performed
         numSets++;
+        //update set counter (add one as is 0-indexed)
+        textViewSetCount.setText(String.valueOf(numSets+1));
         if(numSets >= 2){
             //disable the timer button as maximum number of sets has been reached
             startStopTimer.setEnabled(false);

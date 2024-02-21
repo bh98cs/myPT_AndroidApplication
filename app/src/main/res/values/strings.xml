@@ -30,5 +30,7 @@
     <string name="save">SAVE</string>
     <string name="discard">Discard</string>
     <string name="enter_notes">Enter Notes</string>
+    <string name="reps">Reps:</string>
+    <string name="set_no">Set No:</string>
 
 </resources>

@@ -11,7 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/timerControlPanel"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" >
+
+    </androidx.camera.view.PreviewView>
 
     <daniel.southern.myptapplication.GraphicOverlay
         android:id="@+id/graphicOverlay"
@@ -21,6 +23,7 @@
         app:layout_constraintEnd_toEndOf="@+id/previewView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/previewView" />
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/timerControlPanel"
@@ -63,6 +66,28 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/textView_setCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:backgroundTint="@color/black"
+        android:text="@string/set_no"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/previewView"
+        app:layout_constraintStart_toEndOf="@+id/textView_sets" />
+
+    <TextView
+        android:id="@+id/textView_sets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:backgroundTint="@color/black"
+        android:text="@string/set_no"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/previewView"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 
