@@ -25,6 +25,11 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
     }
 
     @Override
+    public void updateOptions(@NonNull FirestoreRecyclerOptions<ExerciseLog> options) {
+        super.updateOptions(options);
+    }
+
+    @Override
     protected void onBindViewHolder(@NonNull ExerciseLogHolder holder, int position, @NonNull ExerciseLog model) {
 
         //load details of exercise into recycler view using getter methods from class

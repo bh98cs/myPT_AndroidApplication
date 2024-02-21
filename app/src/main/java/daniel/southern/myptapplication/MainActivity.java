@@ -128,6 +128,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //retrieve exercise selected from the spinner
                 String selectedItem = (String)parent.getSelectedItem();
                 Log.i(TAG, "Showing Exercises for " + selectedItem);
+                //create new query to retrieve exercises of the same type selected from spinner
+                Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
+                        .whereEqualTo("exerciseType", selectedItem);
+                //update options for adapter with new query
+                FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
+                        ExerciseLog.class).build();
+                myAdapter.updateOptions(options);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -152,9 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setUpRecyclerView() {
         Log.i(TAG, "Setting up recycler view");
         //TODO: May need to change if allowing user to signup through other accounts
-        Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
-                .whereEqualTo("exerciseType", "squats_up");
-
+        Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail());
         //set options for adapter
         FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
                 ExerciseLog.class).build();
