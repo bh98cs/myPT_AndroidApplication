@@ -31,10 +31,4 @@
     <string name="discard">Discard</string>
     <string name="enter_notes">Enter Notes</string>
 
-    <string-array name="Exercises">
-        <item>All Exercises</item>
-        <item>Push-Ups</item>
-        <item>Squats</item>
-        <item>Dead-lift</item>
-    </string-array>
 </resources>

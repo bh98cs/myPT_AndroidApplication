@@ -1,5 +1,6 @@
 package daniel.southern.myptapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -16,12 +17,18 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -32,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView logoutIcon;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
     private final CollectionReference exerciseLogsRef = database.collection("exerciseLogs");
-
+    //array list to hold the exercises this user has saved data for
+    private ArrayList<String> exercises = new ArrayList<>();
 
     public static final String TAG = "MainActivity";
     @Override
@@ -52,12 +60,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //initialise spinner
         Spinner spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
-        //TODO: follow tutorial https://www.youtube.com/watch?v=GeO5F0nnzAw to only give option
-        // for exercises which have been saved to cloud
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.Exercises, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        spinner_selectedExercise.setAdapter(adapter);
+
+        initList();
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, exercises);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        spinner_selectedExercise.setAdapter(arrayAdapter);
         spinner_selectedExercise.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -79,6 +87,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //set logout icon on click listener
         logoutIcon = findViewById(R.id.imageView_logoutIcon);
         logoutIcon.setOnClickListener(this);
+    }
+
+    private void initList() {
+        exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for(QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots){
+                            ExerciseLog exerciseLog = queryDocumentSnapshot.toObject(ExerciseLog.class);
+                            //check if list already contains the exercise
+                            if(!exercises.contains(exerciseLog.getExerciseType())){
+                                //add the exercise if not already in the list
+                                exercises.add(exerciseLog.getExerciseType());
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Unable to retrieve exercise data", e);
+                    }
+                });
+
     }
 
     private void updateUI(FirebaseUser currentUser) {
