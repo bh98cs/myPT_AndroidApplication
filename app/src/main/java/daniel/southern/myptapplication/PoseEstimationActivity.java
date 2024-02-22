@@ -41,8 +41,6 @@ import daniel.southern.myptapplication.posedetector.classification.PoseClassifie
 @ExperimentalGetImage
 public class PoseEstimationActivity extends AppCompatActivity implements View.OnClickListener{
 
-    //TODO: look into how reps and sets can be displayed on screen -- I think  you will need to revert back
-    // to using the graphic overlay -- look at how this can be styled better
     public static final String EXTRA_ITEM_REPS = "daniel.southern.myptapplication.EXTRA_ITEM_REPS";
     public static final String EXTRA_ITEM_EXERCISE_TYPE = "daniel.southern.myptapplication.EXTRA_ITEM_EXERCISE_TYPE";
 
