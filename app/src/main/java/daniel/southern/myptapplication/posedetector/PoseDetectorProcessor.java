@@ -104,8 +104,8 @@ public class PoseDetectorProcessor {
         try{
             String reps = poseWithClassification.classificationResult.get("reps").toString();
             String exerciseType = poseWithClassification.classificationResult.get("exerciseType").toString();
-            classificationResultList.add(reps + " reps");
-            classificationResultList.add(exerciseType);
+            classificationResultList.add("Reps: " + reps);
+            classificationResultList.add(formatExerciseType(exerciseType));
         }
         catch (NullPointerException e){
         }
@@ -115,6 +115,17 @@ public class PoseDetectorProcessor {
                         graphicOverlay,
                         poseWithClassification.pose,
                         classificationResultList));
+    }
+
+    private String formatExerciseType(String exerciseType) {
+        //check exerciseType is not null or empty
+        if(exerciseType != null && exerciseType != ""){
+            //capitalise the first letter of the exercise type
+            return exerciseType.substring(0,1).toUpperCase()
+                    + exerciseType.substring(1);
+        }
+        //return this if no exercise type is given
+        return "No exercise identified";
     }
 
     protected void onFailure(@NonNull Exception e) {

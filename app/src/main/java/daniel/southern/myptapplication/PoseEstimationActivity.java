@@ -211,38 +211,23 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
 
 
     }
-    private void calculateRepsForSet(){
-        int totalReps;
-        try{
-        //get number of reps performed, needs to be cast to a string and then cast to an integer
-         totalReps = Integer.parseInt(String.valueOf(poseDetectorProcessor.getPoseClassificationResult()
-                .get("reps")));
-        }
-        catch(NumberFormatException e){
-            //set number of reps to 0 if no data for reps is given
-            totalReps = 0;
-        }
 
-        if(numSets > 0){
-            //for loop to go through all entries in reps array
-            for(int i = 0; i < numSets; i++){
-                //subtract previously saved reps from save reps variable
-                //the saveReps variable is the TOTAL reps performed, this is how we
-                // calculate the number of reps performed in this set
-                totalReps -= reps[i];
-            }
+    private String formatExerciseType(String exerciseType) {
+        String formattedExerciseType;
+        //check exerciseType is not null or empty
+        if(exerciseType != null && exerciseType != ""){
+            //get the index of the end of the exercises name (all exercises end with a '_' followed by their 'up'
+            // or 'down' state)
+            int endOfExerciseName = exerciseType.indexOf("_");
+            //remove all characters from the name after '_'
+            formattedExerciseType = exerciseType.substring(0, endOfExerciseName);
+            //capitalise the first letter of the exercise type
+            formattedExerciseType = formattedExerciseType.substring(0,1).toUpperCase()
+                    + formattedExerciseType.substring(1);
+            return formattedExerciseType;
         }
-        Log.i(TAG, "Saving " + totalReps + " reps for set " + numSets);
-        //save the number of reps in array
-        reps[numSets] = totalReps;
-        //increment number of sets performed
-        numSets++;
-        //update set counter (add one as is 0-indexed)
-        textViewSetCount.setText(String.valueOf(numSets+1));
-        if(numSets >= 2){
-            //disable the timer button as maximum number of sets has been reached
-            startStopTimer.setEnabled(false);
-        }
+        //return this if no exercise type is given
+        return "No exercise identified";
     }
 
     private void endRecording() {
@@ -252,7 +237,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         Map<String, Object> poseClassificationResult = poseDetectorProcessor.getPoseClassificationResult();
 
         Intent intent = new Intent(this, EndRecordActivity.class);
-        String exerciseType = poseClassificationResult.get("exerciseType").toString();
+        String exerciseType = formatExerciseType(poseClassificationResult.get("exerciseType").toString());
 
         //intent data to EndRecordActivity to save to DB
         intent.putExtra(EXTRA_ITEM_EXERCISE_TYPE, exerciseType);

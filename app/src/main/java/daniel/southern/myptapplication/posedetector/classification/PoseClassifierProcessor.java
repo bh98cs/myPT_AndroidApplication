@@ -75,7 +75,7 @@ public class PoseClassifierProcessor {
 
         }
 
-        public void startNewSet(){
+    public void startNewSet(){
             for(RepetitionCounter repetitionCounter : repCounters){
                 repetitionCounter.resetNumRepeats();
             }
