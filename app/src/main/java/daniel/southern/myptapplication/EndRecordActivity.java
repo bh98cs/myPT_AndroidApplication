@@ -1,9 +1,11 @@
 package daniel.southern.myptapplication;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ExperimentalGetImage;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -112,10 +114,31 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void discardExercise() {
-        //TODO: add code to confirm discard exercise
-        Log.i(TAG, "Discard Exercise clicked.");
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        //AlertDialog to request confirmation from user before discarding exercise
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Discard Exercise")
+                .setMessage("Are you sure you wish to discard this exercise? If you confirm all data for this exercise" +
+                        " will be lost.")
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG, "User has confirmed to discard exercise.");
+                        //return user to main activity
+                        Intent intent = new Intent(EndRecordActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG, "Discard exercise request cancelled.");
+                        //do nothing as user wants to continue on this activity
+                    }
+                });
+
+        AlertDialog ad = builder.create();
+        ad.show();
+
     }
 
     private void saveExercise() {
