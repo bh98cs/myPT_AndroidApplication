@@ -34,6 +34,7 @@ import com.google.protobuf.StringValue;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import daniel.southern.myptapplication.posedetector.PoseDetectorProcessor;
 import daniel.southern.myptapplication.posedetector.classification.PoseClassifier;
@@ -189,12 +190,14 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         try{
             //get number of reps performed, needs to be cast to a string and then cast to an integer
             repetitions = Integer.parseInt(String.valueOf(poseDetectorProcessor.getPoseClassificationResult()
-                    .get("reps")));
+                        .get("reps")));
+
         }
-        catch(NumberFormatException e){
+        catch(NumberFormatException | NullPointerException e){
             //set number of reps to 0 if no data for reps is given
             repetitions = 0;
         }
+
         Log.i(TAG, "Saving " + repetitions + " reps for set " + numSets);
         //save the number of reps in array
         reps[numSets] = repetitions;
@@ -232,10 +235,19 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         //save reps for the last set performed
         saveRepetitionsForSet();
 
-        Map<String, Object> poseClassificationResult = poseDetectorProcessor.getPoseClassificationResult();
+        Map<String, Object> poseClassificationResult = Objects.requireNonNull(poseDetectorProcessor)
+                .getPoseClassificationResult();
 
         Intent intent = new Intent(this, EndRecordActivity.class);
-        String exerciseType = formatExerciseType(poseClassificationResult.get("exerciseType").toString());
+        String exerciseType;
+
+        try{
+            exerciseType = formatExerciseType(poseClassificationResult.get("exerciseType")
+                    .toString());
+        }
+        catch(NullPointerException e){
+            exerciseType = "No Exercise Identified";
+        }
 
         //intent data to EndRecordActivity to save to DB
         intent.putExtra(EXTRA_ITEM_EXERCISE_TYPE, exerciseType);

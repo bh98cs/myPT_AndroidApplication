@@ -71,7 +71,12 @@ public class PoseDetectorProcessor {
     }
 
     public Map<String, Object> getPoseClassificationResult(){
-        return poseWithClassification.getClassificationResult();
+        try{
+            return poseWithClassification.getClassificationResult();
+        }
+        catch (NullPointerException e){
+            return null;
+        }
     }
 
     public void startNewSet(){
