@@ -1,8 +1,9 @@
 package daniel.southern.myptapplication.posedetector.classification;
 
+import android.util.Log;
+
 public class RepetitionCounter {
-    // These thresholds can be tuned in conjunction with the Top K values in {@link PoseClassifier}.
-    // The default Top K value is 10 so the range here is [0-10].
+    public static final String TAG = "RepetitionCounter";
     private static final float DEFAULT_ENTER_THRESHOLD = 6f;
     private static final float DEFAULT_EXIT_THRESHOLD = 4f;
 
@@ -44,7 +45,14 @@ public class RepetitionCounter {
             poseEntered = false;
         }
 
+        //can control numRepeats within this class
+
         return numRepeats;
+    }
+
+    public void resetNumRepeats(){
+        Log.i(TAG, "Resetting numRepeats from " + numRepeats + " to 0.");
+        numRepeats = 0;
     }
 
     public String getClassName() {

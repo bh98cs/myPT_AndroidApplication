@@ -129,7 +129,8 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
                 //not checked so timer should stop
                 else{
                     Log.i(TAG, "Timer stop.");
-                    calculateRepsForSet();
+                    saveRepetitionsForSet();
+                    poseDetectorProcessor.startNewSet();
                     //call method to stop timer
                     stopTimer();
                 }
@@ -185,6 +186,31 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         }
     }
 
+    private void saveRepetitionsForSet(){
+        int repetitions;
+        try{
+            //get number of reps performed, needs to be cast to a string and then cast to an integer
+            repetitions = Integer.parseInt(String.valueOf(poseDetectorProcessor.getPoseClassificationResult()
+                    .get("reps")));
+        }
+        catch(NumberFormatException e){
+            //set number of reps to 0 if no data for reps is given
+            repetitions = 0;
+        }
+        Log.i(TAG, "Saving " + repetitions + " reps for set " + numSets);
+        //save the number of reps in array
+        reps[numSets] = repetitions;
+        //increment sets counter
+        numSets++;
+        //update set counter (add one as is 0-indexed)
+        textViewSetCount.setText(String.valueOf(numSets+1));
+        if(numSets >= 2){
+            //disable the timer button as maximum number of sets has been reached
+            startStopTimer.setEnabled(false);
+        }
+
+
+    }
     private void calculateRepsForSet(){
         int totalReps;
         try{
@@ -221,7 +247,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
 
     private void endRecording() {
         //save reps for the last set performed
-        calculateRepsForSet();
+        saveRepetitionsForSet();
 
         Map<String, Object> poseClassificationResult = poseDetectorProcessor.getPoseClassificationResult();
 

@@ -74,6 +74,9 @@ public class PoseDetectorProcessor {
         return poseWithClassification.getClassificationResult();
     }
 
+    public void startNewSet(){
+        poseClassifierProcessor.startNewSet();
+    }
 
     protected Task<PoseWithClassification> detectInImage(MlImage image) {
         return detector

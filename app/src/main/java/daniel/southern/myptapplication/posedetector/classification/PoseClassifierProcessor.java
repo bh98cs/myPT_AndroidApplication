@@ -75,6 +75,12 @@ public class PoseClassifierProcessor {
 
         }
 
+        public void startNewSet(){
+            for(RepetitionCounter repetitionCounter : repCounters){
+                repetitionCounter.resetNumRepeats();
+            }
+        }
+
         /**
          * Given a new {@link Pose} input, returns a list of formatted {@link String}s with Pose
          * classification results.
