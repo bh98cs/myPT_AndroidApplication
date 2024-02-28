@@ -16,6 +16,7 @@ import com.google.mlkit.vision.pose.Pose;
 import com.google.mlkit.vision.pose.PoseDetection;
 import com.google.mlkit.vision.pose.PoseDetector;
 import com.google.mlkit.vision.pose.PoseDetectorOptionsBase;
+import com.google.mlkit.vision.pose.PoseLandmark;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,9 +36,7 @@ public class PoseDetectorProcessor {
     private final Context context;
     private final Executor classificationExecutor;
     private final ScopedExecutor executor;
-    private boolean isShutdown;
     private PoseWithClassification poseWithClassification;
-
     private PoseClassifierProcessor poseClassifierProcessor;
     protected static class PoseWithClassification {
 
@@ -48,8 +47,7 @@ public class PoseDetectorProcessor {
             this.pose = pose;
             this.classificationResult = classificationResult;
         }
-
-        public Pose getPose() {
+        public Pose getPose(){
             return pose;
         }
         public Map<String, Object> getClassificationResult(){return classificationResult;}
@@ -81,6 +79,32 @@ public class PoseDetectorProcessor {
 
     public void startNewSet(){
         poseClassifierProcessor.startNewSet();
+    }
+
+    private boolean isEndOfExercise(){
+        Pose pose = poseWithClassification.getPose();
+        if(pose != null){
+            float rightWristY = 0;
+            float leftWristY = 0;
+            float head = 0;
+            try{
+                rightWristY = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST).getPosition().y;
+                leftWristY = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST).getPosition().y;
+                //can use any of the landmarks on the face to get a coordinate of the head
+                head = pose.getPoseLandmark(PoseLandmark.LEFT_EYE_INNER).getPosition().y;
+            }
+            catch(NullPointerException e){
+                //return false as got null for pose landmarks
+                return false;
+            }
+
+            float calcRightHand = rightWristY - head;
+            float calcLeftHand = leftWristY - head;
+            if(calcLeftHand < 0 && calcRightHand < 0){
+                return true;
+            }
+        }
+        return false;
     }
 
     protected Task<PoseWithClassification> detectInImage(MlImage image) {
@@ -120,6 +144,10 @@ public class PoseDetectorProcessor {
                         graphicOverlay,
                         poseWithClassification.pose,
                         classificationResultList));
+
+        if(isEndOfExercise()){
+            Log.i(TAG, "END OF EXERCISE");
+        }
     }
 
     private String formatExerciseType(String exerciseType) {
@@ -139,10 +167,6 @@ public class PoseDetectorProcessor {
 
     @ExperimentalGetImage
     public void processImageProxy(ImageProxy image, GraphicOverlay graphicOverlay) {
-        if (isShutdown) {
-            image.close();
-            return;
-        }
 
         MlImage mlImage =
                 new MediaMlImageBuilder(image.getImage())
@@ -152,11 +176,6 @@ public class PoseDetectorProcessor {
         requestDetectInImage(
                 mlImage,
                 graphicOverlay)
-                // When the image is from CameraX analysis use case, must call image.close() on received
-                // images when finished using them. Otherwise, new images may not be received or the
-                // camera may stall.
-                // Currently MlImage doesn't support ImageProxy directly, so we still need to call
-                // ImageProxy.close() here.
                 .addOnCompleteListener(results -> image.close());
     }
 

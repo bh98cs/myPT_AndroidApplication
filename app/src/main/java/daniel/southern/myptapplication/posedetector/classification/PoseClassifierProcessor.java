@@ -22,7 +22,7 @@ import java.util.Map;
 public class PoseClassifierProcessor {
 
         private static final String TAG = "PoseClassifierProcessor";
-        //TODO: Create your own pose samples file to include deadlifts and weighted squats
+        //TODO: Create your own pose samples file to include deadlifts
         private static final String POSE_SAMPLES_FILE = "pose/fitness_pose_samples.csv";
 
         // Specify classes for which we want rep counting.
@@ -58,7 +58,7 @@ public class PoseClassifierProcessor {
                         new InputStreamReader(context.getAssets().open(POSE_SAMPLES_FILE)));
                 String csvLine = reader.readLine();
                 while (csvLine != null) {
-                    // If line is not a valid {@link PoseSample}, we'll get null and skip adding to the list.
+                    // If line is not a valid, we'll get null and skip adding to the list.
                     PoseSample poseSample = PoseSample.getPoseSample(csvLine, ",");
                     if (poseSample != null) {
                         poseSamples.add(poseSample);

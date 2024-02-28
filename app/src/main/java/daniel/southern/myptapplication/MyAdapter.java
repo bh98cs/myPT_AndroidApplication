@@ -34,7 +34,6 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
 
         //load details of exercise into recycler view using getter methods from class
         holder.textViewDate.setText(model.getDate());
-        //TODO: may get runtime error as trying to insert an int
         holder.textViewSet1.setText(String.valueOf(model.getSet1()));
         holder.textViewSet2.setText(String.valueOf(model.getSet2()));
         holder.textViewSet3.setText(String.valueOf(model.getSet3()));

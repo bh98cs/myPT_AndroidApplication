@@ -1,6 +1,7 @@
 package daniel.southern.myptapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.ExperimentalGetImage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,7 +49,7 @@ public class StartRecordActivity extends AppCompatActivity implements View.OnCli
         //return current date in the specified format
         return dateFormat.format(today);
     }
-
+    @ExperimentalGetImage
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.button_cancel){
@@ -58,13 +59,13 @@ public class StartRecordActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    @ExperimentalGetImage
     private void startRecButtonClicked() {
         Intent intent = new Intent(this, PoseEstimationActivity.class);
         startActivity(intent);
     }
 
     private void cancelButtonClicked() {
-        //TODO: Add Alert dialogue to confirm cancel
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
