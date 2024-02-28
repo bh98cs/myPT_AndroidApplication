@@ -19,16 +19,19 @@ public class PoseGraphic extends GraphicOverlay.Graphic {
     private final Pose pose;
     private final List<String> poseClassification;
     private final Paint classificationTextPaint;
+    private Boolean endPoseDetection;
 
     private final Paint whitePaint;
 
     PoseGraphic(
             GraphicOverlay overlay,
             Pose pose,
-            List<String> poseClassification) {
+            List<String> poseClassification,
+            Boolean endPoseDetection) {
         super(overlay);
         this.pose = pose;
         this.poseClassification = poseClassification;
+        this.endPoseDetection = endPoseDetection;
         classificationTextPaint = new Paint();
         classificationTextPaint.setColor(Color.WHITE);
         classificationTextPaint.setTextSize(POSE_CLASSIFICATION_TEXT_SIZE);
@@ -41,18 +44,26 @@ public class PoseGraphic extends GraphicOverlay.Graphic {
 
     @Override
     public void draw(Canvas canvas) {
+
         List<PoseLandmark> landmarks = pose.getAllPoseLandmarks();
         if (landmarks.isEmpty()) {
             return;
         }
+
         // Draw pose classification text.
         float classificationX = POSE_CLASSIFICATION_TEXT_SIZE * 0.5f;
         for (int i = 0; i < poseClassification.size(); i++) {
             float classificationY =
                     (canvas.getHeight()
                             - POSE_CLASSIFICATION_TEXT_SIZE * 1.5f * (poseClassification.size() - i));
-            canvas.drawText(
-                    poseClassification.get(i), classificationX, classificationY, classificationTextPaint);
+            if(endPoseDetection){
+                canvas.drawText("Pose Detection Ended", classificationX, classificationY, classificationTextPaint);
+            }
+            else{
+                canvas.drawText(
+                        poseClassification.get(i), classificationX, classificationY, classificationTextPaint);
+
+            }
         }
         PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
         PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);

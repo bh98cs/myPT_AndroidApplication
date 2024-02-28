@@ -101,6 +101,7 @@ public class PoseDetectorProcessor {
             float calcRightHand = rightWristY - head;
             float calcLeftHand = leftWristY - head;
             if(calcLeftHand < 0 && calcRightHand < 0){
+                Log.i(TAG, "END OF EXERCISE");
                 return true;
             }
         }
@@ -143,11 +144,8 @@ public class PoseDetectorProcessor {
                 new PoseGraphic(
                         graphicOverlay,
                         poseWithClassification.pose,
-                        classificationResultList));
-
-        if(isEndOfExercise()){
-            Log.i(TAG, "END OF EXERCISE");
-        }
+                        classificationResultList,
+                        isEndOfExercise()));
     }
 
     private String formatExerciseType(String exerciseType) {
