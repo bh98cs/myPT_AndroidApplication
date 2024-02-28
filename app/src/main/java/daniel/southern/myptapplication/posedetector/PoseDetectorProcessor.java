@@ -145,10 +145,11 @@ public class PoseDetectorProcessor {
                 new PoseGraphic(
                         graphicOverlay,
                         poseWithClassification.pose,
-                        classificationResultList,
-                        shutDown));
+                        classificationResultList));
         if(shutDown){
             stop();
+            graphicOverlay.clear();
+            Toast.makeText(graphicOverlay.getContext(), "Exercise Ended", Toast.LENGTH_SHORT).show();
         }
     }
 
