@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        Log.i(TAG, "onSuccess: Retrieved user's exercises.");
                         for(QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots){
                             ExerciseLog exerciseLog = queryDocumentSnapshot.toObject(ExerciseLog.class);
                             //check if list already contains the exercise
@@ -103,10 +105,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         for(int i = 0; i < exercises.size(); i++){
                             exercisesArray[i] = exercises.get(i);
                             Log.i(TAG, exercises.get(i) + " added to array");
-
-                            //array for spinner options has been retrieved, now set the adapter for the spinner
-                            setUpSpinner();
                         }
+                        // setup the adapter for the spinner
+                        setUpSpinner();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -119,29 +120,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setUpSpinner() {
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, exercisesArray);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        spinner_selectedExercise.setAdapter(arrayAdapter);
-        spinner_selectedExercise.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //retrieve exercise selected from the spinner
-                String selectedItem = (String)parent.getSelectedItem();
-                Log.i(TAG, "Showing Exercises for " + selectedItem);
-                //create new query to retrieve exercises of the same type selected from spinner
-                Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
-                        .whereEqualTo("exerciseType", selectedItem);
-                //update options for adapter with new query
-                FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
-                        ExerciseLog.class).build();
-                myAdapter.updateOptions(options);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                Log.i(TAG, "Nothing Selected");
-            }
-        });
+        Log.i(TAG, "setUpSpinner: " + exercisesArray.length);
+        if(exercisesArray.length == 0){
+            spinner_selectedExercise.setVisibility(View.INVISIBLE);
+            //no saved exercises therefore display user feedback
+            TextView textView = findViewById(R.id.textView_previousLogs);
+            textView.setText(R.string.no_exercises);
+        }
+        else{
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, exercisesArray);
+            arrayAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+            spinner_selectedExercise.setAdapter(arrayAdapter);
+            spinner_selectedExercise.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    //retrieve exercise selected from the spinner
+                    String selectedItem = (String)parent.getSelectedItem();
+                    Log.i(TAG, "Showing Exercises for " + selectedItem);
+                    //create new query to retrieve exercises of the same type selected from spinner
+                    Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
+                            .whereEqualTo("exerciseType", selectedItem);
+                    //update options for adapter with new query
+                    FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
+                            ExerciseLog.class).build();
+                    myAdapter.updateOptions(options);
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    Log.i(TAG, "Nothing Selected");
+                }
+            });
+        }
     }
+
 
     private void updateUI(FirebaseUser currentUser) {
         //send user to homepage if not already logged in

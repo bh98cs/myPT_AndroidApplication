@@ -32,5 +32,6 @@
     <string name="enter_notes">Enter Notes</string>
     <string name="reps">Reps:</string>
     <string name="set_no">Set No:</string>
+    <string name="no_exercises">No Exercises Saved Yet.</string>
 
 </resources>
