@@ -38,6 +38,7 @@ public class PoseDetectorProcessor {
     private final ScopedExecutor executor;
     private PoseWithClassification poseWithClassification;
     private PoseClassifierProcessor poseClassifierProcessor;
+    private Boolean shutDown = false;
     protected static class PoseWithClassification {
 
         private final Pose pose;
@@ -81,7 +82,7 @@ public class PoseDetectorProcessor {
         poseClassifierProcessor.startNewSet();
     }
 
-    private boolean isEndOfExercise(){
+    private void isEndOfExercise(){
         Pose pose = poseWithClassification.getPose();
         if(pose != null){
             float rightWristY = 0;
@@ -94,18 +95,15 @@ public class PoseDetectorProcessor {
                 head = pose.getPoseLandmark(PoseLandmark.LEFT_EYE_INNER).getPosition().y;
             }
             catch(NullPointerException e){
-                //return false as got null for pose landmarks
-                return false;
             }
 
             float calcRightHand = rightWristY - head;
             float calcLeftHand = leftWristY - head;
             if(calcLeftHand < 0 && calcRightHand < 0){
                 Log.i(TAG, "END OF EXERCISE");
-                return true;
+                shutDown = true;
             }
         }
-        return false;
     }
 
     protected Task<PoseWithClassification> detectInImage(MlImage image) {
@@ -137,15 +135,21 @@ public class PoseDetectorProcessor {
             classificationResultList.add("Reps: " + reps);
             classificationResultList.add(formatExerciseType(exerciseType));
         }
-        catch (NullPointerException e){
+        catch (NullPointerException ignored){
         }
+
+        //check if user is signalling to end exercise
+        isEndOfExercise();
 
         graphicOverlay.add(
                 new PoseGraphic(
                         graphicOverlay,
                         poseWithClassification.pose,
                         classificationResultList,
-                        isEndOfExercise()));
+                        shutDown));
+        if(shutDown){
+            stop();
+        }
     }
 
     private String formatExerciseType(String exerciseType) {
@@ -195,18 +199,22 @@ public class PoseDetectorProcessor {
                 }
         ).addOnFailureListener(executor,
                 e -> {
-                    graphicOverlay.clear();
-                    graphicOverlay.postInvalidate();
-                    String error = "Failed to process. Error: " + e.getLocalizedMessage();
-                    Toast.makeText(
-                                    graphicOverlay.getContext(),
-                                    error + "\nCause: " + e.getCause(),
-                                    Toast.LENGTH_SHORT)
-                            .show();
-                    Log.d(TAG, error);
-                    e.printStackTrace();
-                    this.onFailure(e);
-                });
+            //check user has not opted to end exercise
+            if(!shutDown){
+                graphicOverlay.clear();
+                graphicOverlay.postInvalidate();
+                String error = "Failed to process. Error: " + e.getLocalizedMessage();
+                Toast.makeText(
+                                graphicOverlay.getContext(),
+                                error + "\nCause: " + e.getCause(),
+                                Toast.LENGTH_SHORT)
+                        .show();
+                Log.d(TAG, error);
+                e.printStackTrace();
+                this.onFailure(e);
+            }
+            });
+
     }
 
 

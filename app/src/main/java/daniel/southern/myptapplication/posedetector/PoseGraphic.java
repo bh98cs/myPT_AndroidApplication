@@ -52,19 +52,21 @@ public class PoseGraphic extends GraphicOverlay.Graphic {
 
         // Draw pose classification text.
         float classificationX = POSE_CLASSIFICATION_TEXT_SIZE * 0.5f;
-        for (int i = 0; i < poseClassification.size(); i++) {
-            float classificationY =
-                    (canvas.getHeight()
-                            - POSE_CLASSIFICATION_TEXT_SIZE * 1.5f * (poseClassification.size() - i));
-            if(endPoseDetection){
-                canvas.drawText("Pose Detection Ended", classificationX, classificationY, classificationTextPaint);
-            }
-            else{
+        if(endPoseDetection){
+            float classificationY = canvas.getHeight() - POSE_CLASSIFICATION_TEXT_SIZE * 1.5f;
+            canvas.drawText("Pose Detection Ended", classificationX, classificationY, classificationTextPaint);
+        }
+        else{
+            for (int i = 0; i < poseClassification.size(); i++) {
+                float classificationY =
+                        (canvas.getHeight()
+                                - POSE_CLASSIFICATION_TEXT_SIZE * 1.5f * (poseClassification.size() - i));
                 canvas.drawText(
                         poseClassification.get(i), classificationX, classificationY, classificationTextPaint);
-
             }
         }
+
+
         PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
         PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
         PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
