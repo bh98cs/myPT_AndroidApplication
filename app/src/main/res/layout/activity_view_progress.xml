@@ -5,11 +5,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ViewProgressActivity">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+
+    <Spinner
+        android:id="@+id/spinner_selectExercise"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32sp"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
     <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/line_chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_margin="10dp"
-        android:id="@+id/line_chart"/>
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_selectExercise" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_menu" />
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
