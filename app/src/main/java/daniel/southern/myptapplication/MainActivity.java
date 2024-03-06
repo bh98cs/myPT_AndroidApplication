@@ -225,11 +225,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 //create background colors and icons to display when swiping items using RecyclerViewSwipeDecorator library
                 new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                        //add background color and icon for deleting (swipe left)
+                        //add background color and icon for deleting by swiping left or right
                         .addSwipeLeftBackgroundColor(MaterialColors.getColor(recyclerView,com.google.android.material.R.attr.colorError))
                         .addSwipeLeftActionIcon(R.drawable.delete_icon).setSwipeLeftActionIconTint(MaterialColors.getColor(recyclerView,
                                 com.google.android.material.R.attr.colorOnError))
-                        //add background color and icon for editing (swipe right)
                         .addSwipeRightBackgroundColor(MaterialColors.getColor(recyclerView,
                                 com.google.android.material.R.attr.colorError))
                         .addSwipeRightActionIcon(R.drawable.delete_icon).setSwipeRightActionIconTint(MaterialColors.getColor(recyclerView,
@@ -293,8 +292,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(MainActivity.this, "Error Undoing Delete", Toast.LENGTH_SHORT).show();
                         }
                     });
-
-
     }
 
     @Override
@@ -355,8 +352,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         //user clicked to view progress
         else if (itemId == R.id.progress) {
-             //TODO: Change to load Progress Activity
              Log.i(TAG, "Loading ProgressActivity");
+             Intent intent = new Intent(MainActivity.this, ViewProgressActivity.class);
+             startActivity(intent);
         }
         return true;
     };

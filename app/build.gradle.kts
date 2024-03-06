@@ -51,6 +51,7 @@ dependencies {
     implementation("androidx.camera:camera-mlkit-vision:1.4.0-alpha04")
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("it.xabaras.android:recyclerview-swipedecorator:1.4")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     val camerax_version = "1.2.2"
     implementation("androidx.camera:camera-core:${camerax_version}")
