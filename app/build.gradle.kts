@@ -50,6 +50,7 @@ dependencies {
     implementation("com.google.mlkit:pose-detection:18.0.0-beta3")
     implementation("androidx.camera:camera-mlkit-vision:1.4.0-alpha04")
     implementation("androidx.multidex:multidex:2.0.1")
+    implementation("it.xabaras.android:recyclerview-swipedecorator:1.4")
 
     val camerax_version = "1.2.2"
     implementation("androidx.camera:camera-core:${camerax_version}")

@@ -51,6 +51,11 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
 
     }
 
+    public void deleteItem(int position){
+        //delete item from Firebase
+        getSnapshots().getSnapshot(position).getReference().delete();
+    }
+
     @NonNull
     @Override
     public ExerciseLogHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

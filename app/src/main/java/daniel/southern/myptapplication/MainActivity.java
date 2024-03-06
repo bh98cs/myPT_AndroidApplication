@@ -4,16 +4,19 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,16 +27,22 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.color.MaterialColors;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -44,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView logoutIcon;
     private Spinner spinner_selectedExercise;
     private RecyclerView recyclerView;
+    private ExerciseLog deletedExercise;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
     private final CollectionReference exerciseLogsRef = database.collection("exerciseLogs");
     //array list to hold the exercises this user has saved data for
@@ -187,6 +197,104 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT
+                | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                //user swipes left or right to delete
+                if(direction == 4 || direction == 8){
+                    //store the position of the item in a local variable
+                    int position = viewHolder.getAdapterPosition();
+                    //store the deleted item incase user wants to undo delete
+                    deletedExercise = myAdapter.getItem(position);
+                    //delete item from recyclerview and Firebase
+                    myAdapter.deleteItem(position);
+                    //call method to give user the option to undo the delete
+                    optionToUndoDelete();
+
+                }
+            }
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                //create background colors and icons to display when swiping items using RecyclerViewSwipeDecorator library
+                new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                        //add background color and icon for deleting (swipe left)
+                        .addSwipeLeftBackgroundColor(MaterialColors.getColor(recyclerView,com.google.android.material.R.attr.colorError))
+                        .addSwipeLeftActionIcon(R.drawable.delete_icon).setSwipeLeftActionIconTint(MaterialColors.getColor(recyclerView,
+                                com.google.android.material.R.attr.colorOnError))
+                        //add background color and icon for editing (swipe right)
+                        .addSwipeRightBackgroundColor(MaterialColors.getColor(recyclerView,
+                                com.google.android.material.R.attr.colorError))
+                        .addSwipeRightActionIcon(R.drawable.delete_icon).setSwipeRightActionIconTint(MaterialColors.getColor(recyclerView,
+                                com.google.android.material.R.attr.colorOnError))
+                        .create()
+                        .decorate();
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        }).attachToRecyclerView(recyclerView);
+    }
+    private void optionToUndoDelete() {
+        RelativeLayout layout = findViewById(R.id.activity_main_layout);
+        //create Snackbar to provide user feedback and give option to undo deletion
+        Snackbar snackbar = Snackbar.make(layout, "Undo Delete", Snackbar.LENGTH_LONG)
+                .setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //call method to undo the deletion if user clicks to Undo
+                        undoDelete();
+                    }
+                });
+        snackbar.show();
+    }
+
+    private void undoDelete() {
+            //check if an item has been deleted in this session
+            if(deletedExercise == null){
+                //user feedback to advise nothing to undo
+                Toast.makeText(this, "Unable to Undo. No items deleted in this session.", Toast.LENGTH_SHORT).show();
+                //return out of method
+                return;
+            }
+
+            //add details from the stored item to a hashmap
+            Map<String, Object> exerciseLog = new HashMap<>();
+            exerciseLog.put("exerciseType", deletedExercise.getExerciseType());
+            exerciseLog.put("date", deletedExercise.getDate());
+            exerciseLog.put("set1", deletedExercise.getSet1());
+            exerciseLog.put("set2", deletedExercise.getSet2());
+            exerciseLog.put("set3", deletedExercise.getSet3());
+            exerciseLog.put("weight", deletedExercise.getWeight());
+            exerciseLog.put("notes", deletedExercise.getNotes());
+            exerciseLog.put("user", currentUser.getEmail());
+
+            //re-upload deleted item to firebase
+            database.collection("exerciseLogs")
+                    .add(exerciseLog)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            //user feedback to advise item deletion has been undone
+                            Toast.makeText(MainActivity.this, "Undo Successful", Toast.LENGTH_SHORT).show();
+                            //set deleted item back to null so that it can not be added back again
+                            deletedExercise = null;
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //advise was unable to undo deletion
+                            Toast.makeText(MainActivity.this, "Error Undoing Delete", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
     }
 
     @Override
