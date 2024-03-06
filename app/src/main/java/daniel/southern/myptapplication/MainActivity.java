@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar toolbar;
     private ImageView logoutIcon;
     private Spinner spinner_selectedExercise;
+    private RecyclerView recyclerView;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
     private final CollectionReference exerciseLogsRef = database.collection("exerciseLogs");
     //array list to hold the exercises this user has saved data for
@@ -58,15 +59,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
         //retrieve current user to check if they're already logged in
         currentUser = mAuth.getCurrentUser();
+        //initialise spinner
+        spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
         //update UI depending on whether user is logged in
         updateUI(currentUser);
 
         //create and initialise bottom navigation view
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
-
-        //initialise spinner
-        spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
 
         //initialise array for spinner options
         initList();
@@ -134,16 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             spinner_selectedExercise.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    //retrieve exercise selected from the spinner
-                    String selectedItem = (String)parent.getSelectedItem();
-                    Log.i(TAG, "Showing Exercises for " + selectedItem);
-                    //create new query to retrieve exercises of the same type selected from spinner
-                    Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
-                            .whereEqualTo("exerciseType", selectedItem);
-                    //update options for adapter with new query
-                    FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
-                            ExerciseLog.class).build();
-                    myAdapter.updateOptions(options);
+                    loadData();
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
@@ -164,24 +155,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else{
             //user is logged in - call method to set up Recycler view
             setUpRecyclerView();
+            loadData();
+        }
+    }
+    private void loadData(){
+        //retrieve exercise selected from the spinner
+        String selectedExercise = (String)spinner_selectedExercise.getSelectedItem();
+        Log.i(TAG, "Showing Exercises for " + selectedExercise);
+        //create new query to retrieve exercises of the same type selected from spinner
+        Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
+                .whereEqualTo("exerciseType", selectedExercise)
+                .orderBy("date", Query.Direction.DESCENDING);
+        //update options for adapter with new query
+        FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
+                ExerciseLog.class).build();
+        //check if adapter has been created
+        if(myAdapter != null){
+            myAdapter.updateOptions(options);
+        }
+        else{
+            //create adapter
+            myAdapter = new MyAdapter(options);
+            //attach adapter to recycler view
+            recyclerView.setAdapter(myAdapter);
         }
     }
 
     private void setUpRecyclerView() {
         Log.i(TAG, "Setting up recycler view");
-        //TODO: May need to change if allowing user to signup through other accounts
-        Query query = exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail());
-        //set options for adapter
-        FirestoreRecyclerOptions<ExerciseLog> options = new FirestoreRecyclerOptions.Builder<ExerciseLog>().setQuery(query,
-                ExerciseLog.class).build();
-
-        //create adapter
-        myAdapter = new MyAdapter(options);
         //create recycler view
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(myAdapter);
     }
 
     @Override
