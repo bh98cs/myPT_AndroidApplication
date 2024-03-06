@@ -145,7 +145,7 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         Log.i(TAG, "Save Exercise Clicked");
         int weight;
         //get current date
-        String date = getTodayDate();
+        Date date = Calendar.getInstance().getTime();
         try{
         //store user input for weight
         weight = Integer.parseInt(weightInput.getText().toString());

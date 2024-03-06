@@ -11,6 +11,10 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.protobuf.StringValue;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.ExerciseLogHolder>{
 
 
@@ -32,8 +36,13 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
     @Override
     protected void onBindViewHolder(@NonNull ExerciseLogHolder holder, int position, @NonNull ExerciseLog model) {
 
+        //set format for date
+        DateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        //convert date to a string
+        String date = df.format(model.getDate());
+
         //load details of exercise into recycler view using getter methods from class
-        holder.textViewDate.setText(model.getDate());
+        holder.textViewDate.setText(date);
         holder.textViewSet1.setText(String.valueOf(model.getSet1()));
         holder.textViewSet2.setText(String.valueOf(model.getSet2()));
         holder.textViewSet3.setText(String.valueOf(model.getSet3()));

@@ -1,9 +1,11 @@
 package daniel.southern.myptapplication;
 
+import java.util.Date;
+
 public class ExerciseLog {
     //declare variables to hold details about exercises
     private String exerciseType;
-    private String date;
+    private Date date;
     private int set1;
     private int set2;
     private int set3;
@@ -17,7 +19,7 @@ public class ExerciseLog {
     }
 
     //class constructor with parameters
-    public ExerciseLog(String exerciseType, String date, int set1, int set2, int set3, int weight, String notes){
+    public ExerciseLog(String exerciseType, Date date, int set1, int set2, int set3, int weight, String notes){
         this.exerciseType = exerciseType;
         this.date = date;
         this.set1 = set1;
@@ -32,7 +34,7 @@ public class ExerciseLog {
         return exerciseType;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
