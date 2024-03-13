@@ -28,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -46,11 +47,13 @@ public class ViewProgressActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private String[] exercisesArray;
     private ArrayList<String> exercises = new ArrayList<>();
-
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
     private final CollectionReference exerciseLogsRef = database.collection("exerciseLogs");
+    private LineDataSet lineDataSet = new LineDataSet(null, null);
+    private ArrayList<ILineDataSet> iLineDataSets = new ArrayList<>();
+    private LineData lineData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,31 +65,25 @@ public class ViewProgressActivity extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
 
         lineChart = findViewById(R.id.line_chart);
-        lineChart.setDragEnabled(true);
-        lineChart.setScaleEnabled(false);
 
         //initialise spinner
         spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
         //initialise array for spinner options
         initList();
-        //update UI depending on whether user is logged in
-        updateUI(currentUser);
+        //check whether user is logged in
+        checkLoggedIn(currentUser);
         //create and initialise bottom navigation view
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
 
     }
 
-    private void updateUI(FirebaseUser currentUser) {
+    private void checkLoggedIn(FirebaseUser currentUser) {
         //send user to homepage if not already logged in
         if(currentUser == null){
             //current user is null therefore they are not logged in. Send them to homepage
             Intent intent = new Intent(this, HomePageActivity.class);
             startActivity(intent);
-        }
-        else{
-            //user is logged in - load data
-            createLineChart();
         }
     }
 
@@ -157,66 +154,67 @@ public class ViewProgressActivity extends AppCompatActivity {
     }
 
     private void createLineChart() {
-        Log.d(TAG, "createLineChart: creating line chart");
-        LineDataSet lineDataSet = new LineDataSet(retrieveData(), "data set");
-        lineDataSet.setFillAlpha(110);
-        lineDataSet.setColor(Color.BLACK);
-        lineDataSet.setLineWidth(3f);
-        ArrayList<ILineDataSet> iLineDataSets = new ArrayList<>();
-        iLineDataSets.add(lineDataSet);
-        LineData lineData = new LineData(iLineDataSets);
-        lineChart.setData(lineData);
-
-        //lineChart.invalidate();
-    }
-
-    private ArrayList<Entry> retrieveData(){
-        //create lists to hold data for visualisation
+        //create list to hold data for visualisation
         ArrayList<Entry> dataset = new ArrayList<>();
-
         //get exercise selected from spinner
-        selectedExercise = (String)spinner_selectedExercise.getSelectedItem();
+        selectedExercise = (String) spinner_selectedExercise.getSelectedItem();
         //retrieve data for exercises of the same type as selected
         exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
                 .whereEqualTo("exerciseType", selectedExercise)
+                .orderBy("date", Query.Direction.ASCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()){
-                            for (QueryDocumentSnapshot document : task.getResult()){
-                                Log.d(TAG, "Retrieved data successfully.");
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Retrieved data successfully.");
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                //TODO: add this to a method to make code simpler
+                                //get sets from document
+                                int set1 = Math.toIntExact((long) document.get("set1"));
+                                int set2 = Math.toIntExact((long) document.get("set2"));
+                                int set3 = Math.toIntExact((long) document.get("set3"));
+                                Log.d(TAG, "onComplete: sets retrieved: " + set1 + " " + set2 + " " + set3);
                                 //add sets to an array
-                                long[] sets = {(long) document.get("set1"),
-                                        (long) document.get("set2"),
-                                        (long) document.get("set3")};
-                                //retrieve data from exercise log
-                                long weight = (long) document.get("weight");
+                                int[] sets = {set1, set2, set3};
+                                //retrieve weight data from exercise log
+                                int weight = Math.toIntExact((long) document.get("weight"));
+                                //retrieve date from exercise log
                                 Date date = document.getTimestamp("date").toDate();
+                                //convert date to just provide day
                                 int numericDate = date.getDate();
                                 //sort array into ascending order
                                 Arrays.sort(sets);
                                 //retrieve max reps done in this exercise
-                                long maxReps = sets[sets.length-1];
+                                int maxReps = sets[sets.length - 1];
                                 //call method to calculate est 1 rep max
-                                long estOneRM = calculateOneRM(weight, maxReps);
+                                int estOneRM = calculateOneRM(weight, maxReps);
                                 Log.d(TAG, "onComplete: adding " + numericDate + " " + estOneRM + " to line graph");
-                                //TODO: PROBLEM LIES HERE! Neither the numericDate or estOneRM can be input into the Entry().
-                                // I think it must be two integers passed into this constructor
                                 dataset.add(new Entry(numericDate, estOneRM));
-
                             }
-                        }else {
+                            showChart(dataset);
+                        } else {
                             Log.d(TAG, "Unable to retrieve data", task.getException());
                         }
                     }
                 });
-        return dataset;
     }
 
-    private long calculateOneRM(long weight, long maxReps) {
+    private void showChart(ArrayList<Entry> dataset) {
+        lineDataSet.setValues(dataset);
+        Log.d(TAG, "showChart: Create chart with values: " + dataset);
+        lineDataSet.setLabel("Est. One Rep Max");
+        iLineDataSets.clear();
+        iLineDataSets.add(lineDataSet);
+        lineData = new LineData(iLineDataSets);
+        lineChart.clear();
+        lineChart.setData(lineData);
+        lineChart.invalidate();
+    }
+
+    private int calculateOneRM(int weight, int maxReps) {
         //calculate estimated one rep max using Epley's equation
-        return (long) ((0.033 * maxReps * weight) + weight);
+        return (int) ((0.033 * maxReps * weight) + weight);
     }
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
