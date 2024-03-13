@@ -15,9 +15,14 @@ import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,10 +38,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.lang.reflect.Array;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ViewProgressActivity extends AppCompatActivity {
 
@@ -46,6 +55,7 @@ public class ViewProgressActivity extends AppCompatActivity {
     private String selectedExercise;
     private Toolbar toolbar;
     private String[] exercisesArray;
+    private ArrayList<ExerciseLog> exerciseLogs;
     private ArrayList<String> exercises = new ArrayList<>();
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -158,39 +168,42 @@ public class ViewProgressActivity extends AppCompatActivity {
         ArrayList<Entry> dataset = new ArrayList<>();
         //get exercise selected from spinner
         selectedExercise = (String) spinner_selectedExercise.getSelectedItem();
-        //retrieve data for exercises of the same type as selected
+        //retrieve 6 most recent data entries for selected exercise
         exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
                 .whereEqualTo("exerciseType", selectedExercise)
-                .orderBy("date", Query.Direction.ASCENDING)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(6)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            exerciseLogs = new ArrayList<>();
                             Log.d(TAG, "Retrieved data successfully.");
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                //TODO: add this to a method to make code simpler
-                                //get sets from document
-                                int set1 = Math.toIntExact((long) document.get("set1"));
-                                int set2 = Math.toIntExact((long) document.get("set2"));
-                                int set3 = Math.toIntExact((long) document.get("set3"));
+                                //add data to an exerciseLog object
+                                ExerciseLog exerciseLog = document.toObject(ExerciseLog.class);
+                                //add exerciseLog to list so it can be sorted by date (ascending)
+                                exerciseLogs.add(exerciseLog);
+                            }
+                            Collections.sort(exerciseLogs, new sortExercises());
+                            int i = 0;
+                            for(ExerciseLog e : exerciseLogs){
+                                //get sets from exercise
+                                int set1 = e.getSet1();
+                                int set2 = e.getSet2();
+                                int set3 = e.getSet3();
                                 Log.d(TAG, "onComplete: sets retrieved: " + set1 + " " + set2 + " " + set3);
                                 //add sets to an array
                                 int[] sets = {set1, set2, set3};
-                                //retrieve weight data from exercise log
-                                int weight = Math.toIntExact((long) document.get("weight"));
-                                //retrieve date from exercise log
-                                Date date = document.getTimestamp("date").toDate();
-                                //convert date to just provide day
-                                int numericDate = date.getDate();
                                 //sort array into ascending order
                                 Arrays.sort(sets);
                                 //retrieve max reps done in this exercise
                                 int maxReps = sets[sets.length - 1];
-                                //call method to calculate est 1 rep max
-                                int estOneRM = calculateOneRM(weight, maxReps);
-                                Log.d(TAG, "onComplete: adding " + numericDate + " " + estOneRM + " to line graph");
-                                dataset.add(new Entry(numericDate, estOneRM));
+                                //call method to calculate est 1 rep max using most reps performed and weight
+                                int estOneRM = calculateOneRM(e.getWeight(), maxReps);
+                                dataset.add(new Entry(i, estOneRM));
+                                i++;
                             }
                             showChart(dataset);
                         } else {
@@ -203,11 +216,29 @@ public class ViewProgressActivity extends AppCompatActivity {
     private void showChart(ArrayList<Entry> dataset) {
         lineDataSet.setValues(dataset);
         Log.d(TAG, "showChart: Create chart with values: " + dataset);
-        lineDataSet.setLabel("Est. One Rep Max");
+        lineDataSet.setLabel("Est. One Rep Max (Kg)");
+        lineDataSet.setLineWidth(3);
+        //TODO: change to match color scheme
+        lineDataSet.setColor(Color.BLACK);
+        lineDataSet.setCircleRadius(5);
+        lineDataSet.setValueTextSize(15);
         iLineDataSets.clear();
         iLineDataSets.add(lineDataSet);
         lineData = new LineData(iLineDataSets);
         lineChart.clear();
+
+
+        final String[] dateLabels = new String[6];
+        int i = 0;
+        for (ExerciseLog e : exerciseLogs){
+            DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+            Log.d(TAG, "showChart: adding date to array: " + df.format(e.getDate()));
+            dateLabels[i] = df.format(e.getDate());
+            i++;
+        }
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(new MyXAxisValueFormatter(dateLabels));
         lineChart.setData(lineData);
         lineChart.invalidate();
     }
