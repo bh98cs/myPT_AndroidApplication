@@ -1,8 +1,11 @@
 package daniel.southern.myptapplication;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,9 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -38,13 +41,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class ViewProgressActivity extends AppCompatActivity {
+public class ViewProgressActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String TAG = "ViewProgressActivity";
     private LineChart lineChart;
     private Spinner spinner_selectedExercise;
     private String selectedExercise;
     private Toolbar toolbar;
+    private ImageView logoutIcon;
     private String[] exercisesArray;
     private ArrayList<ExerciseLog> exerciseLogs;
     private ArrayList<String> exercises = new ArrayList<>();
@@ -71,11 +75,18 @@ public class ViewProgressActivity extends AppCompatActivity {
         spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
         //initialise array for spinner options
         initList();
+        // set tool bar as the action bar
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //set logout icon on click listener
+        logoutIcon = findViewById(R.id.imageView_logoutIcon);
+        logoutIcon.setOnClickListener(this);
         //check whether user is logged in
         checkLoggedIn(currentUser);
         //create and initialise bottom navigation view
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
+        bottomNavigationView.setSelectedItemId(R.id.progress);
 
     }
 
@@ -238,6 +249,33 @@ public class ViewProgressActivity extends AppCompatActivity {
         //calculate estimated one rep max using Epley's equation
         return (int) ((0.033 * maxReps * weight) + weight);
     }
+    private void logout() {
+        //request confirmation to sign out
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewProgressActivity.this);
+        builder.setTitle("Confirm Logout")
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //sign user out
+                        mAuth.signOut();
+                        Log.i(TAG, "User Signed out");
+                        //send user back to home page
+                        Intent intent = new Intent(ViewProgressActivity.this, HomePageActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //do nothing as user does not want to log out
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        //show alert dialog to request confirmation of user logging out
+        dialog.show();
+    }
+
 
     private final BottomNavigationView.OnNavigationItemSelectedListener navListener = item -> {
         //retrieve id of button clicked on nav bar
@@ -257,4 +295,11 @@ public class ViewProgressActivity extends AppCompatActivity {
         return true;
     };
 
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.imageView_logoutIcon) {
+            //call logout method
+            logout();
+        }
+    }
 }
