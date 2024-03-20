@@ -47,6 +47,9 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    //for intenting Firebase ID of an item
+    public static final String EXTRA_ITEM_FIREBASE_ID = "daniel.southern.danielsouthern_cet343assignment.ITEM_FIREBASE_ID";
+    public static final String TAG = "MainActivity";
     private MyAdapter myAdapter;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<String> exercises = new ArrayList<>();
     private String[] exercisesArray;
 
-    public static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -215,8 +217,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                //user swipes left or right to delete
-                if(direction == 4 || direction == 8){
+                //user swipes left to delete
+                if (direction == 4) {
                     //store the position of the item in a local variable
                     int position = viewHolder.getAdapterPosition();
                     //store the deleted item incase user wants to undo delete
@@ -225,7 +227,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     myAdapter.deleteItem(position);
                     //call method to give user the option to undo the delete
                     optionToUndoDelete();
-
+                }
+                //user swipes right to edit
+                else if (direction == 8) {
+                    //send user to activity to edit item
+                    Intent intent = new Intent(MainActivity.this, EditExerciseLogActivity.class);
+                    //get position of the item selected to edit
+                    int position = viewHolder.getAdapterPosition();
+                    //retrieve Firebase ID of item to edit using it's position
+                    String itemFirebaseId = myAdapter.getItemFirebaseId(position);
+                    //send Firebase ID of item to edit to new activity
+                    intent.putExtra(EXTRA_ITEM_FIREBASE_ID, itemFirebaseId);
+                    startActivity(intent);
                 }
             }
             @Override

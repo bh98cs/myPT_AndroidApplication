@@ -51,6 +51,12 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
 
     }
 
+    //method to return item's FireBase doc ID
+    public String getItemFirebaseId(int position){
+        //return the id of the item at the specified position in the recyclerview
+        return getSnapshots().getSnapshot(position).getReference().getId();
+    }
+
     public void deleteItem(int position){
         //delete item from Firebase
         getSnapshots().getSnapshot(position).getReference().delete();

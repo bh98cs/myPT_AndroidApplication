@@ -19,6 +19,9 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".EditExerciseLogActivity"
+            android:exported="false" />
+        <activity
             android:name=".ViewProgressActivity"
             android:exported="false" />
         <activity
