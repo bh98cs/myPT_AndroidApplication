@@ -251,9 +251,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .addSwipeLeftActionIcon(R.drawable.delete_icon).setSwipeLeftActionIconTint(MaterialColors.getColor(recyclerView,
                                 com.google.android.material.R.attr.colorOnError))
                         .addSwipeRightBackgroundColor(MaterialColors.getColor(recyclerView,
-                                com.google.android.material.R.attr.colorError))
-                        .addSwipeRightActionIcon(R.drawable.delete_icon).setSwipeRightActionIconTint(MaterialColors.getColor(recyclerView,
-                                com.google.android.material.R.attr.colorOnError))
+                                com.google.android.material.R.attr.colorTertiary))
+                        .addSwipeRightActionIcon(R.drawable.edit_icon).setSwipeRightActionIconTint(MaterialColors.getColor(recyclerView,
+                                com.google.android.material.R.attr.colorOnTertiary))
                         .create()
                         .decorate();
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
