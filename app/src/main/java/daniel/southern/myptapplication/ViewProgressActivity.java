@@ -37,9 +37,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
 
 public class ViewProgressActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -220,9 +222,9 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         Log.d(TAG, "showChart: Create chart with values: " + dataset);
         lineDataSet.setLabel("Est. One Rep Max (Kg)");
         lineDataSet.setLineWidth(3);
-        //TODO: change to match color scheme
-        lineDataSet.setColor(Color.BLACK);
+        lineDataSet.setColor(R.color.md_theme_primary);
         lineDataSet.setCircleRadius(5);
+        lineDataSet.setCircleColor(R.color.md_theme_primary);
         lineDataSet.setValueTextSize(15);
         iLineDataSets.clear();
         iLineDataSets.add(lineDataSet);
@@ -233,9 +235,8 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         final String[] dateLabels = new String[6];
         int i = 0;
         for (ExerciseLog e : exerciseLogs){
-            DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
-            Log.d(TAG, "showChart: adding date to array: " + df.format(e.getDate()));
-            dateLabels[i] = df.format(e.getDate());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy", Locale.getDefault());
+            dateLabels[i] = dateFormat.format(e.getDate());
             i++;
         }
         XAxis xAxis = lineChart.getXAxis();
