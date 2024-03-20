@@ -44,6 +44,7 @@
             android:layout_marginEnd="16dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
+            android:padding="10dp"
             android:src="@drawable/home_icon"
             app:tint="?attr/colorOnPrimaryContainer" />
 
