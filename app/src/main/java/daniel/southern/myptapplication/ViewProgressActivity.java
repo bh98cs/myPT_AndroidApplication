@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -51,6 +52,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
     private String selectedExercise;
     private Toolbar toolbar;
     private ImageView logoutIcon;
+    private ProgressBar progressBar;
     private String[] exercisesArray;
     private ArrayList<ExerciseLog> exerciseLogs;
     private ArrayList<String> exercises = new ArrayList<>();
@@ -66,12 +68,19 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_progress);
+
+        //initialise progress bar and set to visible
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         //retrieve current user to check if they're already logged in
         currentUser = mAuth.getCurrentUser();
 
         lineChart = findViewById(R.id.line_chart);
+        //set line chart to invisible whilst loading
+        lineChart.setVisibility(View.INVISIBLE);
 
         //initialise spinner
         spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
@@ -157,6 +166,10 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     Log.d(TAG, "onItemSelected: item selected");
+                    //set progress bar to visible whilst creating new graph
+                    progressBar.setVisibility(View.VISIBLE);
+                    //set line chart to invisible whilst loading
+                    lineChart.setVisibility(View.INVISIBLE);
                     createLineChart();
                 }
                 @Override
@@ -190,7 +203,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
                                 //add exerciseLog to list so it can be sorted by date (ascending)
                                 exerciseLogs.add(exerciseLog);
                             }
-                            Collections.sort(exerciseLogs, new SortExercises());
+                            Collections.sort(exerciseLogs, new SortExerciseLogs());
                             int i = 0;
                             for(ExerciseLog e : exerciseLogs){
                                 //get sets from exercise
@@ -244,6 +257,9 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         xAxis.setValueFormatter(new MyXAxisValueFormatter(dateLabels));
         lineChart.setData(lineData);
         lineChart.invalidate();
+        //set line chart to visible
+        lineChart.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     private int calculateOneRM(int weight, int maxReps) {

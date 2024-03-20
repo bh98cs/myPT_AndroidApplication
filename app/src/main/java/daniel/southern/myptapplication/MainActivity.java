@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar toolbar;
     private ImageView logoutIcon;
     private Spinner spinner_selectedExercise;
+    private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private ExerciseLog deletedExercise;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -65,6 +67,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Initialize progress bar
+        progressBar = findViewById(R.id.progressBar);
+        Log.d(TAG, "onCreate: set progress bar to visible");
+        progressBar.setVisibility(View.VISIBLE);
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         //retrieve current user to check if they're already logged in
@@ -118,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         // setup the adapter for the spinner
                         setUpSpinner();
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
