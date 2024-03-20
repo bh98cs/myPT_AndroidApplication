@@ -188,7 +188,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
                                 //add exerciseLog to list so it can be sorted by date (ascending)
                                 exerciseLogs.add(exerciseLog);
                             }
-                            Collections.sort(exerciseLogs, new sortExercises());
+                            Collections.sort(exerciseLogs, new SortExercises());
                             int i = 0;
                             for(ExerciseLog e : exerciseLogs){
                                 //get sets from exercise
