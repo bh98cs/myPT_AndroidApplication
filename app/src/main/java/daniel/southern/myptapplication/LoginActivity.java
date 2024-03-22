@@ -54,7 +54,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     //declare functional views on Activity
     private Button loginBtn;
     private Button createAccBtn;
-    private Button googleSignIn;
     private EditText userEmail;
     private EditText userPassword;
     private Toolbar toolbar;
@@ -81,14 +80,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //Initialize views
         loginBtn = findViewById(R.id.button_Login);
         createAccBtn = findViewById(R.id.button_CreateAccount);
-        googleSignIn = findViewById(R.id.button2);
         userEmail = findViewById(R.id.editText_UserEmail);
         userPassword = findViewById(R.id.editText_Password);
 
         //set onclick listener for buttons
         loginBtn.setOnClickListener(this);
         createAccBtn.setOnClickListener(this);
-        googleSignIn.setOnClickListener(this);
 
         //get intent that started activity
         Intent intent = getIntent();
@@ -138,14 +135,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //send user to homepage
             Intent intent = new Intent(this, HomePageActivity.class);
             startActivity(intent);
-        } else if (v.getId() == R.id.button2) {
-            signInWithGoogle();
         }
-    }
-
-    private void signInWithGoogle() {
-        Intent intent = googleSignInClient.getSignInIntent();
-        startActivityForResult(intent, REQ_SIGN_IN);
     }
 
     @Override
