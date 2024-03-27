@@ -173,10 +173,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
     private void setUpSpinner() {
         Log.i(TAG, "setUpSpinner: length = " + exercisesArray.length);
         if(exercisesArray.length == 0){
-            spinner_selectedExercise.setVisibility(View.INVISIBLE);
-            //no saved exercises therefore display user feedback
-            TextView textView = findViewById(R.id.textView_previousLogs);
-            textView.setText(R.string.no_exercises);
+            noExerciseLogs();
         }
         else{
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(ViewProgressActivity.this, android.R.layout.simple_spinner_item, exercisesArray);
@@ -198,6 +195,16 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
                 }
             });
         }
+    }
+
+    private void noExerciseLogs() {
+        CardView noLogsGif = findViewById(R.id.noLogsGif);
+        showLoadingGif(false);
+        spinner_selectedExercise.setVisibility(View.INVISIBLE);
+        //no saved exercises therefore display user feedback
+        TextView textView = findViewById(R.id.textView_noExercises);
+        textView.setVisibility(View.VISIBLE);
+        noLogsGif.setVisibility(View.VISIBLE);
     }
 
     private void createLineChart() {

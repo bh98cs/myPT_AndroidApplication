@@ -45,6 +45,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+import pl.droidsonroids.gif.GifImageView;
 
 
 import java.util.ArrayList;
@@ -180,10 +181,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setUpSpinner() {
         Log.i(TAG, "setUpSpinner: " + exercisesArray.length);
         if(exercisesArray.length == 0){
-            spinner_selectedExercise.setVisibility(View.INVISIBLE);
-            //no saved exercises therefore display user feedback
-            TextView textView = findViewById(R.id.textView_previousLogs);
-            textView.setText(R.string.no_exercises);
+            noExerciseData();
         }
         else{
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, exercisesArray);
@@ -200,6 +198,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
+    }
+
+    private void noExerciseData() {
+        spinner_selectedExercise.setVisibility(View.INVISIBLE);
+        //no saved exercises therefore display user feedback
+        TextView textView = findViewById(R.id.textView_previousLogs);
+        textView.setText(R.string.no_exercises);
+
+        //display gif to signal no data has been saved yet
+        CardView noLogsGif;
+        //initialise noLogsGif
+        noLogsGif = findViewById(R.id.noLogsGif);
+        noLogsGif.setVisibility(View.VISIBLE);
     }
 
 

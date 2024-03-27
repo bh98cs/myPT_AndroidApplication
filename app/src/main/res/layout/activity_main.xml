@@ -42,12 +42,49 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="20dp"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        app:cardBackgroundColor="#F7F7F7">
         <pl.droidsonroids.gif.GifImageView
             android:layout_width="255dp"
             android:layout_height="255dp"
             android:src="@drawable/loadinggif"/>
     </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/noLogsGif"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        app:cardBackgroundColor="#FCFDFB">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/gif"
+                android:layout_width="255dp"
+                android:layout_height="200dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/no_data_gif" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/gif"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="8dp"
+                android:textSize="20dp"
+                android:text="@string/no_exercise_data"/>
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
 
     <TextView
         android:id="@+id/textView_previousLogs"
@@ -66,16 +103,4 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/textView_previousLogs"
         android:layout_above="@+id/bottomNavigation"/>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:visibility="gone"/>
-
-
-
-
 </RelativeLayout>

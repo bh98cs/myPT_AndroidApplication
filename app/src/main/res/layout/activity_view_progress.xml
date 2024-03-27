@@ -59,14 +59,56 @@
 
     </androidx.cardview.widget.CardView>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/noLogsGif"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-/>
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"
+        app:cardBackgroundColor="#FCFDFB"
+        app:cardCornerRadius="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/line_chart"
+        app:layout_constraintEnd_toEndOf="@+id/line_chart"
+        app:layout_constraintStart_toStartOf="@+id/line_chart"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_selectExercise">
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/gif"
+                android:layout_width="255dp"
+                android:layout_height="200dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/no_data_gif" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/gif"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="8dp"
+                android:text="@string/no_exercise_data"
+                android:textSize="20dp" />
 
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/textView_noExercises"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner_selectExercise"
+        android:layout_centerHorizontal="true"
+        android:text="@string/no_exercises"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/noLogsGif"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_shadow" />
 </androidx.constraintlayout.widget.ConstraintLayout>
