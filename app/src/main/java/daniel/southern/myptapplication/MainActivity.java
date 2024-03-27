@@ -21,6 +21,10 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,7 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener{
 
     //for intenting Firebase ID of an item
     public static final String EXTRA_ITEM_FIREBASE_ID = "daniel.southern.danielsouthern_cet343assignment.ITEM_FIREBASE_ID";
@@ -64,6 +68,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //array list to hold the exercises this user has saved data for
     private ArrayList<String> exercises = new ArrayList<>();
     private String[] exercisesArray;
+    //declare Sensor and SensorManager for detecting device shaking
+    private SensorManager sensorManager;
+    private Sensor accelerometerSensor;
+    //bool to track whether accelerometer is available
+    private boolean isAccelerometerAvailable;
+    //bool to track whether Accelerometer is detecting the first movements of the device
+    private boolean notFirstTime = false;
+    //variables for shake detection, tracking coordinates of the device
+    private float currentX, currentY, currentZ, lastX, lastY, lastZ;
+    private float xDifference, yDifference, zDifference;
+    //variable to determine whether device has been shaken sufficiently
+    private final float shakeThreshold = 3f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressBar = findViewById(R.id.progressBar);
         Log.d(TAG, "onCreate: set progress bar to visible");
         progressBar.setVisibility(View.VISIBLE);
+
+        initialiseSensor();
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -328,6 +346,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        //set sensor event listener if accelerometer is available
+        if(isAccelerometerAvailable){
+            sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //check if sensor was available
+        if(isAccelerometerAvailable){
+            //unregister the listener
+            sensorManager.unregisterListener(this);
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.imageView_logoutIcon) {
             //call logout method
@@ -379,4 +416,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return true;
     };
+
+    private void initialiseSensor(){
+        //set sensor manager
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        //check if accelerometer is available
+        if(sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
+            //initialise sensor
+            accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            //set boolean to true to indicate sensor is available
+            isAccelerometerAvailable = true;
+            Log.d(TAG, "Accelerometer is available.");
+
+        }
+        else{
+            Log.w(TAG, "Accelerometer is unavailable.");
+            //set boolean to false to disable shake gesture
+            isAccelerometerAvailable = false;
+        }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        //store values of coordinates of device
+        currentX = event.values[0];
+        currentY = event.values[1];
+        currentZ = event.values[2];
+
+        //check this is not the first time device has detected movement
+        if(notFirstTime){
+            //get difference between last and current X, Y, Z values
+            xDifference = Math.abs(lastX - currentX);
+            yDifference = Math.abs(lastY - currentY);
+            zDifference = Math.abs(lastZ = currentZ);
+
+            //check that device has been shaken sufficiently
+            if((xDifference > shakeThreshold && yDifference > shakeThreshold) ||
+                    (xDifference > shakeThreshold && zDifference > shakeThreshold) ||
+                    (yDifference > shakeThreshold && zDifference > shakeThreshold)){
+                //give option to undo deletion
+                optionToUndoDelete();
+            }
+        }
+
+        //store coordinates to reference again when another shake is detected
+        lastX = currentX;
+        lastY = currentY;
+        lastZ = currentZ;
+
+        //set bool to indicate this is not the first movements of the device
+        notFirstTime = true;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        //empty override as must implement this method
+    }
 }
