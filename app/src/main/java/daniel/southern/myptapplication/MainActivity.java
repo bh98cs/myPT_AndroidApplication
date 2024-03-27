@@ -163,8 +163,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showLoadingGif(boolean b) {
         if(b){
             loadingGif.setVisibility(View.VISIBLE);
+            loadingGif.bringToFront();
         }
-        else{
+        else {
             //add a delay so user can see loading icon (looks better than it disappearing straight away)
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {

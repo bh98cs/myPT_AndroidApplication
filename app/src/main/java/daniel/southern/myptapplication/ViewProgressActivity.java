@@ -106,6 +106,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
     private void showLoadingGif(boolean b) {
         if(b){
             loadingGif.setVisibility(View.VISIBLE);
+            loadingGif.bringToFront();
         }
         else{
             //add a delay so user can see loading icon (looks better than it disappearing straight away)
