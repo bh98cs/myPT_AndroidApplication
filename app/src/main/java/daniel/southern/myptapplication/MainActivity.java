@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar toolbar;
     private ImageView logoutIcon;
     private Spinner spinner_selectedExercise;
-    private ProgressBar progressBar;
+    private CardView loadingGif;
     private RecyclerView recyclerView;
     private ExerciseLog deletedExercise;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -85,10 +87,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // Initialize progress bar
-        progressBar = findViewById(R.id.progressBar);
-        Log.d(TAG, "onCreate: set progress bar to visible");
-        progressBar.setVisibility(View.VISIBLE);
+
+        loadingGif = findViewById(R.id.loadingGif);
+        showLoadingGif(true);
 
         initialiseSensor();
 
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         // setup the adapter for the spinner
                         setUpSpinner();
-                        progressBar.setVisibility(View.INVISIBLE);
+                        showLoadingGif(false);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -154,6 +155,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.e(TAG, "Unable to retrieve exercise data", e);
                     }
                 });
+
+    }
+
+    //method to toggle whether to show loading icon
+    private void showLoadingGif(boolean b) {
+        if(b){
+            loadingGif.setVisibility(View.VISIBLE);
+        }
+        else{
+            //add a delay so user can see loading icon (looks better than it disappearing straight away)
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    loadingGif.setVisibility(View.INVISIBLE);
+
+                }
+            }, 2000);
+        }
 
     }
 

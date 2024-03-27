@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -52,7 +54,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
     private String selectedExercise;
     private Toolbar toolbar;
     private ImageView logoutIcon;
-    private ProgressBar progressBar;
+    private CardView loadingGif;
     private String[] exercisesArray;
     private ArrayList<ExerciseLog> exerciseLogs;
     private ArrayList<String> exercises = new ArrayList<>();
@@ -70,8 +72,8 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.activity_view_progress);
 
         //initialise progress bar and set to visible
-        progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.VISIBLE);
+        loadingGif = findViewById(R.id.loadingGif);
+        showLoadingGif(true);
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -98,6 +100,24 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
         bottomNavigationView.setSelectedItemId(R.id.progress);
+
+    }
+
+    private void showLoadingGif(boolean b) {
+        if(b){
+            loadingGif.setVisibility(View.VISIBLE);
+        }
+        else{
+            //add a delay so user can see loading icon (looks better than it disappearing straight away)
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    loadingGif.setVisibility(View.INVISIBLE);
+
+                }
+            }, 2000);
+        }
 
     }
 
@@ -167,7 +187,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     Log.d(TAG, "onItemSelected: item selected");
                     //set progress bar to visible whilst creating new graph
-                    progressBar.setVisibility(View.VISIBLE);
+                    showLoadingGif(true);
                     //set line chart to invisible whilst loading
                     lineChart.setVisibility(View.INVISIBLE);
                     createLineChart();
@@ -259,7 +279,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         lineChart.invalidate();
         //set line chart to visible
         lineChart.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
+        showLoadingGif(false);
     }
 
     private int calculateOneRM(int weight, int maxReps) {

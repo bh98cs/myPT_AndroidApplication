@@ -28,8 +28,8 @@
             android:id="@+id/textView_set1Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="64dp"
             android:text="@string/set_1Title"
+            app:layout_constraintEnd_toStartOf="@+id/textView_set2Title"
             app:layout_constraintStart_toEndOf="@+id/textViewDate"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -37,9 +37,9 @@
             android:id="@+id/textView_set2Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="64dp"
             android:text="@string/set_2Title"
-            app:layout_constraintEnd_toStartOf="@+id/textView_set3Title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView_dateTitle"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -48,6 +48,7 @@
             android:layout_height="wrap_content"
             android:text="@string/set_3Title"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView_set2Title"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
