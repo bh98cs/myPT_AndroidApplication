@@ -109,12 +109,17 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
             loadingGif.bringToFront();
         }
         else{
+            //disable spinner whilst loading gif is displayed
+            spinner_selectedExercise.setEnabled(false);
             //add a delay so user can see loading icon (looks better than it disappearing straight away)
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     loadingGif.setVisibility(View.INVISIBLE);
+                    spinner_selectedExercise.setEnabled(true);
+                    //set line chart to visible
+                    lineChart.setVisibility(View.VISIBLE);
 
                 }
             }, 2000);
@@ -285,8 +290,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         xAxis.setValueFormatter(new MyXAxisValueFormatter(dateLabels));
         lineChart.setData(lineData);
         lineChart.invalidate();
-        //set line chart to visible
-        lineChart.setVisibility(View.VISIBLE);
+        //hide loading gif
         showLoadingGif(false);
     }
 

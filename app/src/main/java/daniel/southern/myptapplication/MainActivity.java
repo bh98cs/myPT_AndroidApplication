@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private CardView loadingGif;
     private RecyclerView recyclerView;
     private ExerciseLog deletedExercise;
+    private BottomNavigationView bottomNavigationView;
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
     private final CollectionReference exerciseLogsRef = database.collection("exerciseLogs");
     //array list to hold the exercises this user has saved data for
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateUI(currentUser);
 
         //create and initialise bottom navigation view
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
+        bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
 
         //initialise array for spinner options
@@ -166,16 +167,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             loadingGif.bringToFront();
         }
         else {
+            //disable all views whilst still showing loading gif
+            enableAll(false);
             //add a delay so user can see loading icon (looks better than it disappearing straight away)
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     loadingGif.setVisibility(View.INVISIBLE);
+                    enableAll(true);
 
                 }
             }, 2000);
         }
+
+    }
+
+    private void enableAll(boolean b){
+        if(b){
+            recyclerView.setVisibility(View.VISIBLE);
+        }else{
+            recyclerView.setVisibility(View.INVISIBLE);
+        }
+        spinner_selectedExercise.setEnabled(b);
 
     }
 
