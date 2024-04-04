@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -166,7 +165,6 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         exerciseLog.put("set3", reps[2]);
         exerciseLog.put("weight", weight);
         exerciseLog.put("notes", notes);
-        //TODO: potentially need to change this when allowing other types of accounts
         exerciseLog.put("user", currentUser.getEmail());
 
         //add new document with generated ID

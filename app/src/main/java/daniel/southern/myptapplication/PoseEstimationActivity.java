@@ -29,15 +29,11 @@ import android.widget.TextView;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions;
-import com.google.protobuf.StringValue;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import daniel.southern.myptapplication.posedetector.PoseDetectorProcessor;
-import daniel.southern.myptapplication.posedetector.classification.PoseClassifier;
 
 @ExperimentalGetImage
 public class PoseEstimationActivity extends AppCompatActivity implements View.OnClickListener{
