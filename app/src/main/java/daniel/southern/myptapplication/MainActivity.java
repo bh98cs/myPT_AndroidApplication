@@ -367,6 +367,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(MainActivity.this, "Undo Successful", Toast.LENGTH_SHORT).show();
                             //set deleted item back to null so that it can not be added back again
                             deletedExercise = null;
+                            //notify item has been readded
+                            myAdapter.notifyDataSetChanged();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
