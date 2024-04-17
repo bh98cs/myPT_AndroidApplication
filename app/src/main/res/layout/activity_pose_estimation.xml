@@ -38,8 +38,11 @@
             android:layout_height="90dp"
             android:layout_marginStart="16dp"
             android:checked="false"
-            android:textOff="START"
-            android:textOn="STOP"
+            android:textOff="@string/start_button"
+            android:textOn="@string/stop_button"
+            android:background="@drawable/round_button"
+            android:backgroundTint="?attr/colorTertiaryContainer"
+            android:textColor="?attr/colorOnTertiaryContainer"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/endButton"
             app:layout_constraintTop_toTopOf="parent" />
@@ -49,7 +52,7 @@
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:layout_marginStart="16dp"
-            android:text="END"
+            android:text="@string/end_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

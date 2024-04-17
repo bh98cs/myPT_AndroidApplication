@@ -5,6 +5,7 @@
     <string name="email">Email:</string>
     <string name="enter_email">Enter Email</string>
     <string name="confirm_password">Confirm Password:</string>
+    <string name="confirm_password_hint">Confirm Password</string>
     <string name="create_account">Create Account</string>
     <string name="login">Login</string>
     <string name="cancel">Cancel</string>
@@ -35,5 +36,8 @@
     <string name="no_exercises">No Exercises Saved Yet…</string>
     <string name="default_web_client_id">104466847160-kvoa1f87j4ik4le9h38h7ctq9nticeda.apps.googleusercontent.com</string>
     <string name="no_exercise_data">Let\'s Get To Work!</string>
+    <string name="start_button">START</string>
+    <string name="stop_button">STOP</string>
+    <string name="end_button">END</string>
 
 </resources>

@@ -22,7 +22,6 @@ import java.util.Map;
 public class PoseClassifierProcessor {
 
         private static final String TAG = "PoseClassifierProcessor";
-        //TODO: Create your own pose samples file to include deadlifts
         private static final String POSE_SAMPLES_FILE = "pose/fitness_pose_samples.csv";
 
         // Specify classes for which we want rep counting.
@@ -77,7 +76,7 @@ public class PoseClassifierProcessor {
 
     public void startNewSet(){
             for(RepetitionCounter repetitionCounter : repCounters){
-                repetitionCounter.resetNumRepeats();
+                    repetitionCounter.resetNumRepeats();
             }
         }
 

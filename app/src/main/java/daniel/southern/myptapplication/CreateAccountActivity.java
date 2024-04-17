@@ -20,8 +20,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class CreateAccountActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //TODO: Make use of Firebase SDKs to implement email verification
-
     //constant variable for sending contents of email address field to LoginActivity
     public static final String EXTRA_EMAIL_ADDRESS = "daniel.southern.myptapplication.EXTRA_EMAIL_ADDRESS";
     //tag for logs

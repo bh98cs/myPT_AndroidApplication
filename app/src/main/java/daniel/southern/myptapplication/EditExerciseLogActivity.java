@@ -95,7 +95,11 @@ public class EditExerciseLogActivity extends AppCompatActivity implements View.O
             loadExerciseLogDetails();
         }
         else{
-            //TODO: Alert dialogue to say no exercise data found
+            //message to user to advise could not retrieve exercise data
+            Toast.makeText(this, "Unable to retrieve exercise data.", Toast.LENGTH_SHORT).show();
+            //return user to main activity
+            intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
     }
 

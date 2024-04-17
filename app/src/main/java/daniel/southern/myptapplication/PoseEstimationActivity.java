@@ -204,6 +204,9 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         if(numSets >= 2){
             //disable the timer button as maximum number of sets has been reached
             startStopTimer.setEnabled(false);
+            //set timer and timer button to invisible
+            startStopTimer.setVisibility(View.INVISIBLE);
+            timerView.setVisibility(View.INVISIBLE);
         }
 
 

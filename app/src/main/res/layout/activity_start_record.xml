@@ -38,7 +38,6 @@
         android:textSize="30sp"
         android:textStyle="bold"/>
 
-    <!--TODO: change to a round button-->
     <Button
         android:id="@+id/button_start"
         android:layout_width="95dp"

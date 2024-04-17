@@ -79,7 +79,11 @@ public class PoseDetectorProcessor {
     }
 
     public void startNewSet(){
-        poseClassifierProcessor.startNewSet();
+        //check pose classifier has been instantiated
+        if(poseClassifierProcessor != null){
+            //start new set
+            poseClassifierProcessor.startNewSet();
+        }
     }
 
     private void isEndOfExercise(){

@@ -308,10 +308,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 //create background colors and icons to display when swiping items using RecyclerViewSwipeDecorator library
                 new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                        //add background color and icon for deleting by swiping left or right
+                        //add background color and icon for deleting by swiping left
                         .addSwipeLeftBackgroundColor(MaterialColors.getColor(recyclerView,com.google.android.material.R.attr.colorError))
                         .addSwipeLeftActionIcon(R.drawable.delete_icon).setSwipeLeftActionIconTint(MaterialColors.getColor(recyclerView,
                                 com.google.android.material.R.attr.colorOnError))
+                        //add background color and icon for editing by swiping right
                         .addSwipeRightBackgroundColor(MaterialColors.getColor(recyclerView,
                                 com.google.android.material.R.attr.colorTertiary))
                         .addSwipeRightActionIcon(R.drawable.edit_icon).setSwipeRightActionIconTint(MaterialColors.getColor(recyclerView,

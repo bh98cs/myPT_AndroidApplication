@@ -29,7 +29,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
-    //TODO: make use of Firebase SDKs to implement password reset
 
     //tag for logs for this activity
     public static final String TAG = "LoginActivity";
