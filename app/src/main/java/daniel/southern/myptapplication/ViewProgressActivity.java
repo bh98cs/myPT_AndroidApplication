@@ -286,6 +286,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         xAxis.setGranularity(1f);
         xAxis.setValueFormatter(new MyXAxisValueFormatter(dateLabels));
         lineChart.setData(lineData);
+        lineChart.setDescription(null);
         lineChart.invalidate();
         //hide loading gif
         showLoadingGif(false);
