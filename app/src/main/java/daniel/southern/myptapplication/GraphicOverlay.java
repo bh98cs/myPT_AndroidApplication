@@ -11,29 +11,30 @@ import com.google.android.gms.common.internal.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Graphic overlay for UI
+ */
 public class GraphicOverlay extends View {
     private final Object lock = new Object();
     private final List<Graphic> graphics = new ArrayList<>();
-    // Matrix for transforming from image coordinates to overlay view coordinates.
+    // Matrix for transforming from image coordinates to overlay coordinates.
     private final Matrix transformationMatrix = new Matrix();
 
     private int imageWidth;
     private int imageHeight;
-    // The factor of overlay View size to image size. Anything in the image coordinates need to be
-    // scaled by this amount to fit with the area of overlay View.
+
+    //used to scale image to fit the overlay view
     private float scaleFactor = 1.0f;
-    // The number of horizontal pixels needed to be cropped on each side to fit the image with the
-    // area of overlay View after scaling.
+
+    // The number of horizontal pixels to be cropped to fit the image within the overlay View
     private float postScaleWidthOffset;
-    // The number of vertical pixels needed to be cropped on each side to fit the image with the
-    // area of overlay View after scaling.
+
+    // The number of vertical pixels to be cropped to fit the image within the overlay View
     private float postScaleHeightOffset;
     private boolean needUpdateTransformation = true;
 
     /**
-     * Base class for a custom graphics object to be rendered within the graphic overlay. Subclass
-     * this and implement the {@link Graphic#draw(Canvas)} method to define the graphics element. Add
-     * instances to the overlay using {@link GraphicOverlay#add(Graphic)}.
+     * Base class for a graphic object to be created within an overlay
      */
     public abstract static class Graphic {
         private GraphicOverlay overlay;
@@ -43,17 +44,8 @@ public class GraphicOverlay extends View {
         }
 
         /**
-         * Draw the graphic on the supplied canvas. Drawing should use the following methods to convert
-         * to view coordinates for the graphics that are drawn:
-         *
-         * <ol>
-         *   <li>{@link Graphic#scale(float)} adjusts the size of the supplied value from the image
-         *       scale to the view scale.
-         *   <li>{@link Graphic#translateX(float)} and {@link Graphic#translateY(float)} adjust the
-         *       coordinate from the image's coordinate system to the view coordinate system.
-         * </ol>
-         *
-         * @param canvas drawing canvas
+         * Draws the graphic on the overlay
+         * @param canvas the canvas which graphics can be drawn on
          */
         public abstract void draw(Canvas canvas);
 
@@ -100,11 +92,10 @@ public class GraphicOverlay extends View {
     }
 
     /**
-     * Sets the source information of the image being processed by detectors, including size and
-     * whether it is flipped, which informs how to transform image coordinates later.
+     * Sets the source information of the image being processed to transform image coordinates
      *
-     * @param imageWidth the width of the image sent to ML Kit detectors
-     * @param imageHeight the height of the image sent to ML Kit detectors
+     * @param imageWidth the width of the image sent to pose detector
+     * @param imageHeight the height of the image sent to pose detector
      */
     public void setImageSourceInfo(int imageWidth, int imageHeight) {
         Preconditions.checkState(imageWidth > 0, "image width must be positive");
@@ -117,6 +108,9 @@ public class GraphicOverlay extends View {
         postInvalidate();
     }
 
+    /**
+     * Transforms the image (cropping, scaling and translating) if needed
+     */
     private void updateTransformationIfNeeded() {
         if (!needUpdateTransformation || imageWidth <= 0 || imageHeight <= 0) {
             return;
@@ -145,7 +139,7 @@ public class GraphicOverlay extends View {
         needUpdateTransformation = false;
     }
 
-    /** Draws the overlay with its associated graphic objects. */
+    /** Draws the overlay with its graphic objects. */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);

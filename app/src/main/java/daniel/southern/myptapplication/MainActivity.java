@@ -54,7 +54,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //for intenting Firebase ID of an item
     public static final String EXTRA_ITEM_FIREBASE_ID = "daniel.southern.danielsouthern_cet343assignment.ITEM_FIREBASE_ID";
+
+    //tag for logs
     public static final String TAG = "MainActivity";
+
+    //recycler view adapter
     private MyAdapter myAdapter;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -88,9 +92,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //display loading animation
         loadingGif = findViewById(R.id.loadingGif);
         showLoadingGif(true);
 
+        //set up sensor for shake detection
         initialiseSensor();
 
         // Initialize Firebase Auth
@@ -100,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //initialise spinner
         spinner_selectedExercise = findViewById(R.id.spinner_selectExercise);
         //update UI depending on whether user is logged in
-        updateUI(currentUser);
+        checkLoggedIn(currentUser);
 
         //create and initialise bottom navigation view
         bottomNavigationView = findViewById(R.id.bottomNavigation);
@@ -118,6 +124,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         logoutIcon.setOnClickListener(this);
     }
 
+    /**
+     * Retrieves a list of exercises stored in the Cloud for the user. Exercises are added
+     * to the spinner for user to select from
+     */
     private void initList() {
         exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
                 .get()
@@ -158,7 +168,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    //method to toggle whether to show loading icon
+    /**
+     * Toggles whether the loading Gif is visible
+     * @param b boolean to inidcate whether the gif should be visible
+     */
     private void showLoadingGif(boolean b) {
         if(b){
             loadingGif.setVisibility(View.VISIBLE);
@@ -176,11 +189,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     enableAll(true);
 
                 }
-            }, 2000);
+            }, 2000); //short delay so user can see loading icon (looks better than it disappearing straight away)
         }
 
     }
 
+    /**
+     * Method to toggle whether views are enabled for the user
+     * @param b boolean to indicate whether views should be enabled
+     */
     private void enableAll(boolean b){
         if(b){
             recyclerView.setVisibility(View.VISIBLE);
@@ -191,6 +208,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /**
+     * Method to add names of saved exercises to the spinner and to set onItemSelected listener
+     */
     private void setUpSpinner() {
         Log.i(TAG, "setUpSpinner: " + exercisesArray.length);
         if(exercisesArray.length == 0){
@@ -213,6 +233,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * Method to change UI if user has no saved exercise data
+     */
     private void noExerciseData() {
         spinner_selectedExercise.setVisibility(View.INVISIBLE);
         //no saved exercises therefore display user feedback
@@ -226,8 +249,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         noLogsGif.setVisibility(View.VISIBLE);
     }
 
-
-    private void updateUI(FirebaseUser currentUser) {
+    /**
+     * Method to check whether user has been authenticated
+     * @param currentUser current Firebase User
+     */
+    private void checkLoggedIn(FirebaseUser currentUser) {
         //send user to homepage if not already logged in
         if(currentUser == null){
             //current user is null therefore they are not logged in. Send them to homepage
@@ -240,6 +266,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             loadData();
         }
     }
+
+    /**
+     * Method to retrieve data from the Firestore database for the current user
+     */
     private void loadData(){
         //retrieve exercise selected from the spinner
         String selectedExercise = (String)spinner_selectedExercise.getSelectedItem();
@@ -263,6 +293,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * Creates recyclerview to display data. Adds a touch listener to
+     * detect when a user swipes on an exercise item
+     */
     private void setUpRecyclerView() {
         Log.i(TAG, "Setting up recycler view");
         //create recycler view
@@ -323,6 +357,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }).attachToRecyclerView(recyclerView);
     }
+
+    /**
+     * Gives the user the option to request to undo their most recent deletion of an exercise
+     */
     private void optionToUndoDelete() {
         RelativeLayout layout = findViewById(R.id.activity_main_layout);
         //create Snackbar to provide user feedback and give option to undo deletion
@@ -337,6 +375,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         snackbar.show();
     }
 
+    /**
+     * Reuploads the most recently deleted exercise item to the Firestore database
+     */
     private void undoDelete() {
             //check if an item has been deleted in this session
             if(deletedExercise == null){
@@ -419,6 +460,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * Logs the user out of the application
+     */
     private void logout() {
         //request confirmation to sign out
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -464,6 +508,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     };
 
+    /**
+     * Creates the sensor for shake detection
+     */
     private void initialiseSensor(){
         //set sensor manager
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);

@@ -36,8 +36,7 @@ public class EditExerciseLogActivity extends AppCompatActivity implements View.O
     private FirebaseAuth mAuth;
     //declare instance to store current user details
     private FirebaseUser currentUser;
-    //declare instances of FireBase database references for uploading data to
-    private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    //declare instances of FireBase database references for uploading data
     private final FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     //reference for the item selected for editing
@@ -49,7 +48,6 @@ public class EditExerciseLogActivity extends AppCompatActivity implements View.O
     private EditText editText_set3;
     private EditText editText_weight;
     private EditText editText_notes;
-    private String editNotes;
     private Button button_save;
     private Button button_discard;
     private ProgressBar progressBar;
@@ -91,7 +89,7 @@ public class EditExerciseLogActivity extends AppCompatActivity implements View.O
             Log.d(TAG, "onCreate: Retrieving data for " + firebaseDocId);
             //retrieve item from firebase using ID intented from MainActivity
             editExerciseLogRef = database.collection("exerciseLogs").document(firebaseDocId);
-            //position is not default value therefore a position of item to edit has been given
+            //load data for selected exercise
             loadExerciseLogDetails();
         }
         else{
@@ -103,6 +101,10 @@ public class EditExerciseLogActivity extends AppCompatActivity implements View.O
         }
     }
 
+    /**
+     * Check if user has been authenticated
+     * @param currentUser the current user
+     */
     private void checkLoggedIn(FirebaseUser currentUser) {
         //send user to login page if not already logged in
         if(currentUser == null){
@@ -110,6 +112,10 @@ public class EditExerciseLogActivity extends AppCompatActivity implements View.O
             startActivity(intent);
         }
     }
+
+    /**
+     * Load exercise data from Firebase Cloud database
+     */
     private void loadExerciseLogDetails() {
         editExerciseLogRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -152,6 +158,10 @@ public class EditExerciseLogActivity extends AppCompatActivity implements View.O
             }
         });
     }
+
+    /**
+     * Update Firebase database with changes to the exercise data made by the user
+     */
     private void updateExerciseLog() {
         //display progress bar whilst saving data
         progressBar.setVisibility(View.VISIBLE);

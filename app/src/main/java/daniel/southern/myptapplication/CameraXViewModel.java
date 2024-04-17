@@ -14,6 +14,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * View model required for using CameraX
+ */
 public class CameraXViewModel extends AndroidViewModel {
     private static final String TAG = "CameraXViewModel";
     private MutableLiveData<ProcessCameraProvider> cameraProviderLiveData;
@@ -34,8 +37,7 @@ public class CameraXViewModel extends AndroidViewModel {
                         try {
                             cameraProviderLiveData.setValue(cameraProviderFuture.get());
                         } catch (ExecutionException | InterruptedException e) {
-                            // Handle any errors (including cancellation) here.
-                            Log.e(TAG, "Unhandled exception", e);
+                            Log.e(TAG, "CameraX exception", e);
                         }
                     },
                     ContextCompat.getMainExecutor(getApplication()));

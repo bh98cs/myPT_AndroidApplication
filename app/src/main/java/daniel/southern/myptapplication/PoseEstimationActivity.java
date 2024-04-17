@@ -38,11 +38,14 @@ import daniel.southern.myptapplication.posedetector.PoseDetectorProcessor;
 @ExperimentalGetImage
 public class PoseEstimationActivity extends AppCompatActivity implements View.OnClickListener{
 
+    //constant to intent number of repetitions performed
     public static final String EXTRA_ITEM_REPS = "daniel.southern.myptapplication.EXTRA_ITEM_REPS";
+
+    //constant to intent name of exercise performed
     public static final String EXTRA_ITEM_EXERCISE_TYPE = "daniel.southern.myptapplication.EXTRA_ITEM_EXERCISE_TYPE";
 
+    // tag for logs
     public static final String TAG = "PoseEstimationActivity";
-    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     @Nullable
     private ProcessCameraProvider cameraProvider;
     private PreviewView previewView;
@@ -60,6 +63,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
     private int[] reps = new int[3];
 
 
+    //request permission for the camera
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -75,6 +79,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pose_estimation);
 
+        //select front facing camera to use for pose estimation (so user can see the screen)
         cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
 
         previewView = findViewById(R.id.previewView);
@@ -98,7 +103,6 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
             Log.w(TAG, "Permission not granted.");
             requestPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
-
 
         textViewSetCount = findViewById(R.id.textView_setCount);
 
@@ -125,6 +129,7 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
                 else{
                     Log.i(TAG, "Timer stop.");
                     saveRepetitionsForSet();
+                    //begin a new set for the exercise
                     poseDetectorProcessor.startNewSet();
                     //call method to stop timer
                     stopTimer();
@@ -133,6 +138,9 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         });
     }
 
+    /**
+     * Creates and starts pose detector. Binds the camera to the application lifecycle
+     */
     private void bindAnalysisUseCase() {
         PoseDetectorOptions.Builder builder = new PoseDetectorOptions.Builder().setDetectorMode(PoseDetectorOptions.STREAM_MODE);
         poseDetectorProcessor = new PoseDetectorProcessor(this, builder.build());
@@ -149,6 +157,9 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         cameraProvider.bindToLifecycle(this, cameraSelector, analysisUseCase);
     }
 
+    /**
+     * Creates camera preview and binds to lifecycle so user can see real-time pose estimation
+     */
     private void bindPreviewUseCase() {
         if (previewUseCase != null) {
             cameraProvider.unbind(previewUseCase);
@@ -162,13 +173,17 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
                 cameraProvider.bindToLifecycle(/* lifecycleOwner= */ this, cameraSelector, previewUseCase);
     }
 
-    //method to stop timer
+    /**
+     * Stops timer
+     */
     private void stopTimer() {
         timerView.stop();
         timerView.setBase(SystemClock.elapsedRealtime());
     }
 
-    //method to start timer
+    /**
+     * Starts timer
+     */
     private void startTimer() {
         timerView.setBase(SystemClock.elapsedRealtime());
         timerView.start();
@@ -181,6 +196,9 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         }
     }
 
+    /**
+     * caches the number of reps performed in an array to be uploaded to the database later
+     */
     private void saveRepetitionsForSet(){
         int repetitions;
         try{
@@ -212,11 +230,16 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
 
     }
 
+    /**
+     * Formats the name of the exercise to be displayed in the UI and saved to database
+     * @param exerciseType name of the exercise classification
+     * @return formatted name of the exercise
+     */
     private String formatExerciseType(String exerciseType) {
         String formattedExerciseType;
         //check exerciseType is not null or empty
         if(exerciseType != null && exerciseType != ""){
-            //get the index of the end of the exercises name (all exercises end with a '_' followed by their 'up'
+            //get the index of the end of the exercise's name (all exercise names end with a '_' followed by their 'up'
             // or 'down' state)
             int endOfExerciseName = exerciseType.indexOf("_");
             //remove all characters from the name after '_'
@@ -230,6 +253,9 @@ public class PoseEstimationActivity extends AppCompatActivity implements View.On
         return "No exercise identified";
     }
 
+    /**
+     * Ends the pose detector and exercise recording
+     */
     private void endRecording() {
         //save reps for the last set performed
         saveRepetitionsForSet();

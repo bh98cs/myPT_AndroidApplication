@@ -39,12 +39,18 @@ public class HomePageActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /**
+     * Sends user to {@link CreateAccountActivity}
+     */
     private void goToCreateAccountPage() {
         //send user to create account page
         Intent intent = new Intent(HomePageActivity.this, CreateAccountActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Sends user to {@link LoginActivity}
+     */
     private void goToLoginPage() {
         //send user to login page
         Intent intent = new Intent(HomePageActivity.this, LoginActivity.class);

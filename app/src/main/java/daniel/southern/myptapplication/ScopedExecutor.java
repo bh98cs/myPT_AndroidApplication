@@ -5,9 +5,10 @@ import androidx.annotation.NonNull;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Executor class required for pose detection
+ */
 public class ScopedExecutor implements Executor {
-
-
     private final Executor executor;
     private final AtomicBoolean shutdown = new AtomicBoolean();
 

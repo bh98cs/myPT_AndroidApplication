@@ -2,8 +2,12 @@ package daniel.southern.myptapplication.posedetector.classification;
 
 import android.util.Log;
 
+/**
+ * Class to count the number of repetitions performed for an exercise
+ */
 public class RepetitionCounter {
     public static final String TAG = "RepetitionCounter";
+    //top K thresholds for entering and exiting a pose
     private static final float DEFAULT_ENTER_THRESHOLD = 6f;
     private static final float DEFAULT_EXIT_THRESHOLD = 4f;
 
@@ -14,6 +18,10 @@ public class RepetitionCounter {
     private int numRepeats;
     private boolean poseEntered;
 
+    /**
+     * {@link RepetitionCounter} class constructor
+     * @param className name of the exercise class
+     */
     public RepetitionCounter(String className) {
         this(className, DEFAULT_ENTER_THRESHOLD, DEFAULT_EXIT_THRESHOLD);
     }
@@ -27,10 +35,10 @@ public class RepetitionCounter {
     }
 
     /**
-     * Adds a new Pose classification result and updates reps for given class.
+     * Method to add a new {@link ClassificationResult} and update the reps
      *
-     * @param classificationResult {link ClassificationResult} of class to confidence values.
-     * @return number of reps.
+     * @param classificationResult {@link ClassificationResult}
+     * @return number of repetitions performed
      */
     public int addClassificationResult(ClassificationResult classificationResult) {
         float poseConfidence = classificationResult.getClassConfidence(className);
@@ -45,11 +53,12 @@ public class RepetitionCounter {
             poseEntered = false;
         }
 
-        //can control numRepeats within this class
-
         return numRepeats;
     }
 
+    /**
+     * Reset the number of repetitions performed for exercise class
+     */
     public void resetNumRepeats(){
         Log.i(TAG, "Resetting numRepeats from " + numRepeats + " to 0.");
         numRepeats = 0;

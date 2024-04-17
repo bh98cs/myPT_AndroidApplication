@@ -2,6 +2,9 @@ package daniel.southern.myptapplication;
 
 import java.util.Date;
 
+/**
+ * Class for an Exercise Log
+ */
 public class ExerciseLog {
     //declare variables to hold details about exercises
     private String exerciseType;
@@ -18,7 +21,16 @@ public class ExerciseLog {
         //empty constructor needed for Firebase
     }
 
-    //class constructor with parameters
+    /**
+     * Class constructor
+     * @param exerciseType name of the exercise completed
+     * @param date date of completing the exercise
+     * @param set1 number of repetitions in the first set
+     * @param set2 number of repetitions in the second set
+     * @param set3 number of repetitions in the third set
+     * @param weight the weight used for the exercise
+     * @param notes any additional notes made by the user
+     */
     public ExerciseLog(String exerciseType, Date date, int set1, int set2, int set3, int weight, String notes){
         this.exerciseType = exerciseType;
         this.date = date;

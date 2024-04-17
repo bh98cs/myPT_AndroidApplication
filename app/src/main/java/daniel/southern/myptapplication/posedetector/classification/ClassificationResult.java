@@ -6,13 +6,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Class to store exercise classes and their confidence score. Confidence score is based on the number of times
+ * the class appears in the Top K nearest neighbours.
+ */
 public class ClassificationResult {
 
     //hash map to store confidence scores for exercises
     private final Map<String, Float> classConfidences;
 
     /**
-     * ClassificationResult class constructor.
+     * {@link ClassificationResult} class constructor.
      * Creates new hashmap to store classes and confidence scores
      */
     public ClassificationResult() {

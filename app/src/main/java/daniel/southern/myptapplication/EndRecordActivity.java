@@ -42,8 +42,6 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private FirebaseFirestore database = FirebaseFirestore.getInstance();
-    private final FirebaseStorage storage = FirebaseStorage.getInstance();
-    private StorageReference storageRef;
     private int[] reps = new int[3];
     private String exerciseType;
 
@@ -59,7 +57,7 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         //retrieve current user to check if they're already logged in
         currentUser = mAuth.getCurrentUser();
         //check user is logged in before proceeding
-        updateUI(currentUser);
+        checkLoggedIn(currentUser);
 
         //get intent that started activity
         Intent intent = getIntent();
@@ -68,7 +66,7 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         //store exercise type detected in previous activity
         exerciseType = intent.getStringExtra(PoseEstimationActivity.EXTRA_ITEM_EXERCISE_TYPE);
 
-
+        //instantiate views
         currentDate = findViewById(R.id.textView_currentDate);
         weightInput = findViewById(R.id.editText_weight);
         notesInput = findViewById(R.id.editText_notes);
@@ -86,7 +84,11 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         discardBtn.setOnClickListener(this);
     }
 
-    private void updateUI(FirebaseUser currentUser) {
+    /**
+     * Check if user has been authenticated
+     * @param currentUser Firebase user
+     */
+    private void checkLoggedIn(FirebaseUser currentUser) {
         //send user to login page if not already logged in
         if(currentUser == null){
             Intent intent = new Intent(this, LoginActivity.class);
@@ -94,6 +96,10 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    /**
+     * Retrieve current date
+     * @return current date in format "dd-MM-yyyy"
+     */
     private String getTodayDate() {
         //get current date
         Date today = Calendar.getInstance().getTime();
@@ -112,6 +118,9 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    /**
+     * Method to discard the newly created exercise
+     */
     private void discardExercise() {
         //AlertDialog to request confirmation from user before discarding exercise
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -140,6 +149,9 @@ public class EndRecordActivity extends AppCompatActivity implements View.OnClick
 
     }
 
+    /**
+     * Method to save the newly created exercise to the Cloud database
+     */
     private void saveExercise() {
         Log.i(TAG, "Save Exercise Clicked");
         int weight;

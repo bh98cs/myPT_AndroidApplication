@@ -12,15 +12,28 @@ import com.google.mlkit.vision.pose.PoseLandmark;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class for embedding a list of pose landmarks
+ */
 public class PoseEmbedding {
-    // Multiplier to apply to the torso to get minimal body size. Picked this by experimentation.
+    // Multiplier to apply to the torso to get minimal body size
     private static final float TORSO_MULTIPLIER = 2.5f;
 
+    /**
+     *
+     * @param landmarks list of pose landmarks
+     * @return list of landmarks after normalization
+     */
     public static List<PointF3D> getPoseEmbedding(List<PointF3D> landmarks) {
         List<PointF3D> normalizedLandmarks = normalize(landmarks);
         return getEmbedding(normalizedLandmarks);
     }
 
+    /**
+     * Normalizes a list of pose landmarks
+     * @param landmarks list of pose landmarks
+     * @return list of normalized pose landmarks
+     */
     private static List<PointF3D> normalize(List<PointF3D> landmarks) {
         List<PointF3D> normalizedLandmarks = new ArrayList<>(landmarks);
         // Normalize translation.
@@ -35,10 +48,12 @@ public class PoseEmbedding {
         return normalizedLandmarks;
     }
 
-    // Translation normalization should've been done prior to calling this method.
+    /**
+     * Uses 2D landmarks to calculate pose size
+     * @param landmarks pose landmarks
+     * @return pose size
+     */
     private static float getPoseSize(List<PointF3D> landmarks) {
-        // Note: This approach uses only 2D landmarks to compute pose size as using Z wasn't helpful
-        // in our experimentation but you're welcome to tweak.
         PointF3D hipsCenter = average(
                 landmarks.get(PoseLandmark.LEFT_HIP), landmarks.get(PoseLandmark.RIGHT_HIP));
 
@@ -49,8 +64,6 @@ public class PoseEmbedding {
         float torsoSize = l2Norm2D(subtract(hipsCenter, shouldersCenter));
 
         float maxDistance = torsoSize * TORSO_MULTIPLIER;
-        // torsoSize * TORSO_MULTIPLIER is the floor we want based on experimentation but actual size
-        // can be bigger for a given pose depending on extension of limbs etc so we calculate that.
         for (PointF3D landmark : landmarks) {
             float distance = l2Norm2D(subtract(hipsCenter, landmark));
             if (distance > maxDistance) {
@@ -63,12 +76,7 @@ public class PoseEmbedding {
     private static List<PointF3D> getEmbedding(List<PointF3D> lm) {
         List<PointF3D> embedding = new ArrayList<>();
 
-        // We use several pairwise 3D distances to form pose embedding. These were selected
-        // based on experimentation for best results with our default pose classes as captued in the
-        // pose samples csv. Feel free to play with this and add or remove for your use-cases.
-
-        // We group our distances by number of joints between the pairs.
-        // One joint.
+        // group  distances by number of joints between the pairs
         embedding.add(subtract(
                 average(lm.get(PoseLandmark.LEFT_HIP), lm.get(PoseLandmark.RIGHT_HIP)),
                 average(lm.get(PoseLandmark.LEFT_SHOULDER), lm.get(PoseLandmark.RIGHT_SHOULDER))

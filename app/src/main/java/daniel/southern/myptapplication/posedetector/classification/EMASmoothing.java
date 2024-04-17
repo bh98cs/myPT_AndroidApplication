@@ -7,7 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
 
-//TODO:Research EMA smoothing and add comments to explain whats being done
+/**
+ * Class to run EMA smoothing
+ */
 public class EMASmoothing {
     private static final int DEFAULT_WINDOW_SIZE = 10;
     private static final float DEFAULT_ALPHA = 0.2f;
@@ -16,8 +18,6 @@ public class EMASmoothing {
 
     private final int windowSize;
     private final float alpha;
-    // This is a window of {@link ClassificationResult}s as outputted by the {@link PoseClassifier}.
-    // We run smoothing over this window of size {@link windowSize}.
     private final Deque<ClassificationResult> window;
 
     private long lastInputMs;
@@ -33,14 +33,14 @@ public class EMASmoothing {
     }
 
     public ClassificationResult getSmoothedResult(ClassificationResult classificationResult) {
-        // Resets memory if the input is too far away from the previous one in time.
+        // Resets memory if the duration between inputs too long
         long nowMs = SystemClock.elapsedRealtime();
         if (nowMs - lastInputMs > RESET_THRESHOLD_MS) {
             window.clear();
         }
         lastInputMs = nowMs;
 
-        // If we are at window size, remove the last (oldest) result.
+        // If at window size, remove the last result.
         if (window.size() == windowSize) {
             window.pollLast();
         }

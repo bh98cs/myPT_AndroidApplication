@@ -29,6 +29,9 @@ import daniel.southern.myptapplication.GraphicOverlay;
 import daniel.southern.myptapplication.ScopedExecutor;
 import daniel.southern.myptapplication.posedetector.classification.PoseClassifierProcessor;
 
+/**
+ * Class to run the pose detector
+ */
 public class PoseDetectorProcessor {
 
     private static final String TAG = "PoseDetectorProcessor";
@@ -39,6 +42,10 @@ public class PoseDetectorProcessor {
     private PoseWithClassification poseWithClassification;
     private PoseClassifierProcessor poseClassifierProcessor;
     private Boolean shutDown = false;
+
+    /**
+     * subclass to run pose detection with pose classification
+     */
     protected static class PoseWithClassification {
 
         private final Pose pose;
@@ -86,6 +93,10 @@ public class PoseDetectorProcessor {
         }
     }
 
+    /**
+     * Method to check whether user has entered the pose to signal the end of the pose detection.
+     * End of pose position is entered by holding both hands above head.
+     */
     private void isEndOfExercise(){
         Pose pose = poseWithClassification.getPose();
         if(pose != null){
@@ -110,6 +121,11 @@ public class PoseDetectorProcessor {
         }
     }
 
+    /**
+     * Detect the user's pose within an image
+     * @param image image containing user pose
+     * @return result of {@link PoseWithClassification}
+     */
     protected Task<PoseWithClassification> detectInImage(MlImage image) {
         return detector
                 .process(image)
@@ -136,6 +152,7 @@ public class PoseDetectorProcessor {
         try{
             String reps = poseWithClassification.classificationResult.get("reps").toString();
             String exerciseType = poseWithClassification.classificationResult.get("exerciseType").toString();
+            //add number of repetitions performed and the name of exercise to the results list
             classificationResultList.add("Reps: " + reps);
             classificationResultList.add(formatExerciseType(exerciseType));
         }
@@ -157,6 +174,11 @@ public class PoseDetectorProcessor {
         }
     }
 
+    /**
+     * Formats the name of the exercise
+     * @param exerciseType name of the detected exercise
+     * @return name of the exercise formatted for use in the UI
+     */
     private String formatExerciseType(String exerciseType) {
         //check exerciseType is not null or empty
         if(exerciseType != null && exerciseType != ""){

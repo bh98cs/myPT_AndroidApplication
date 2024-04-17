@@ -27,15 +27,14 @@ import java.util.Locale;
 
 public class StartRecordActivity extends AppCompatActivity implements View.OnClickListener{
 
+    //tag for logs
     public static final String TAG = "StartRecordActivity";
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
-
     private TextClock clock;
     private TextView currentDate;
     private Toolbar toolbar;
     private ImageView logoutIcon;
-    private Button cancelBtn;
     private Button startRecBtn;
 
     @Override
@@ -73,6 +72,11 @@ public class StartRecordActivity extends AppCompatActivity implements View.OnCli
         startRecBtn = findViewById(R.id.button_start);
         startRecBtn.setOnClickListener(this);
     }
+
+    /**
+     * Checks if user has been authenticated
+     * @param currentUser current Firebase user
+     */
     private void checkLoggedIn(FirebaseUser currentUser) {
         //send user to homepage if not already logged in
         if(currentUser == null){
@@ -81,7 +85,11 @@ public class StartRecordActivity extends AppCompatActivity implements View.OnCli
             startActivity(intent);
         }
     }
-    //method to retrieve current date
+
+    /**
+     * Retrieves current date
+     * @return current date in format "dd-MMM-yyyy"
+     */
     private String getTodayDate() {
         //get current date
         Date today = Calendar.getInstance().getTime();
@@ -101,6 +109,9 @@ public class StartRecordActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    /**
+     * Logs a user out of their account
+     */
     private void logout() {
         //request confirmation to sign out
         AlertDialog.Builder builder = new AlertDialog.Builder(StartRecordActivity.this);
@@ -129,6 +140,9 @@ public class StartRecordActivity extends AppCompatActivity implements View.OnCli
     }
 
 
+    /**
+     * Sends the user to {@link StartRecordActivity}
+     */
     @ExperimentalGetImage
     private void startRecButtonClicked() {
         Intent intent = new Intent(this, PoseEstimationActivity.class);

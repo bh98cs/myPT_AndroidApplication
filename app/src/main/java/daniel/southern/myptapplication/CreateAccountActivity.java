@@ -24,9 +24,7 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
     public static final String EXTRA_EMAIL_ADDRESS = "daniel.southern.myptapplication.EXTRA_EMAIL_ADDRESS";
     //tag for logs
     public static final String TAG = "CreateAccountActivity";
-    //declare instance of FireBase Auth
     private FirebaseAuth mAuth;
-    //declare instances of views
     private EditText userEmail;
     private EditText userPassword;
     private Button createAccBtn;
@@ -40,7 +38,7 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
 
-        //set toolbar as activities actionbar
+        //set toolbar as activity's actionbar
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -114,7 +112,11 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    //create new user and save credentials to Firebase
+    /**
+     * Create a new account using Firebase Auth
+     * @param email email address for account
+     * @param password password for account
+     */
     private void createNewUser(String email, String password){
         //create new user using email and password
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -138,7 +140,12 @@ public class CreateAccountActivity extends AppCompatActivity implements View.OnC
                 });
     }
 
-    //check if both password boxes are identical
+    /**
+     * Check that the user has provided two matching passwords
+     * @param pw1 first password
+     * @param pw2 second password
+     * @return bool indicating whether passwords match
+     */
     private boolean passwordsMatch(String pw1, String pw2){
         return pw1.equals(pw2);
     }

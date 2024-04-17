@@ -83,6 +83,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //prepopulate email address for user if filled out in CreateAccountActivity
         userEmail.setText(email);
 
+        //connect to GoogleSignIn API
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -134,14 +135,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try{
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuth(account.getIdToken());
+                googleSignIn(account.getIdToken());
             }catch (Exception e){
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void firebaseAuth(String idToken) {
+    /**
+     *  Sign in to application using GoogleSignIn API
+     * @param idToken id token for API
+     */
+    private void googleSignIn(String idToken) {
         AuthCredential authCredential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(authCredential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -158,6 +163,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 });
     }
 
+    /**
+     * Sign in using email and password saved on Firebase Auth database
+     * @param email email address supplied by user
+     * @param password password supplied by user
+     */
     private void signIn(String email, String password) {
 
         //sign user in with their email and password

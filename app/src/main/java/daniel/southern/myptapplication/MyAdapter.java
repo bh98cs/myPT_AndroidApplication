@@ -22,7 +22,7 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
      * Create a new RecyclerView adapter that listens to a Firestore Query.  See {@link
      * FirestoreRecyclerOptions} for configuration options.
      *
-     * @param options
+     * @param options configuration options
      */
     public MyAdapter(@NonNull FirestoreRecyclerOptions<ExerciseLog> options) {
         super(options);
@@ -51,12 +51,20 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
 
     }
 
-    //method to return item's FireBase doc ID
+    /**
+     * Retrieves the Firebase ID of the document at the given position
+     * @param position position of the document within the recylerview
+     * @return Firebase ID for the document
+     */
     public String getItemFirebaseId(int position){
         //return the id of the item at the specified position in the recyclerview
         return getSnapshots().getSnapshot(position).getReference().getId();
     }
 
+    /**
+     * Deletes the document at the given position from the Firestore database
+     * @param position position of the document within the recyclerview
+     */
     public void deleteItem(int position){
         //delete item from Firebase
         getSnapshots().getSnapshot(position).getReference().delete();
@@ -69,6 +77,9 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
         return new ExerciseLogHolder(v);
     }
 
+    /**
+     * Inner class to display data from each Firestore document within recycler view
+     */
     class ExerciseLogHolder extends RecyclerView.ViewHolder{
         //declare views containing exercise details
         TextView textViewDate;
@@ -78,6 +89,10 @@ public class MyAdapter extends FirestoreRecyclerAdapter<ExerciseLog, MyAdapter.E
         TextView textViewWeight;
         TextView textViewNotes;
 
+        /**
+         * {@link ExerciseLogHolder} class constructor
+         * @param itemView
+         */
         public ExerciseLogHolder(@NonNull View itemView) {
             super(itemView);
             //initialise views

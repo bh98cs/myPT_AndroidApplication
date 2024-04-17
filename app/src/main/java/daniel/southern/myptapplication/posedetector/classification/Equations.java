@@ -7,8 +7,14 @@ import com.google.mlkit.vision.common.PointF3D;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * Class containing equations for pose estimation and classification
+ */
 public class Equations {
 
+    /**
+     * {@link Equations} Class constructor
+     */
     private Equations(){}
 
     public static PointF3D add(PointF3D a, PointF3D b) {

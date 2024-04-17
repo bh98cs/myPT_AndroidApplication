@@ -11,8 +11,12 @@ import com.google.mlkit.vision.pose.PoseLandmark;
 import java.util.List;
 
 import daniel.southern.myptapplication.GraphicOverlay;
+import daniel.southern.myptapplication.GraphicOverlay.Graphic;
 
-public class PoseGraphic extends GraphicOverlay.Graphic {
+/**
+ * Draws kinematic representation of user's pose
+ */
+public class PoseGraphic extends Graphic {
 
     private static final float POSE_CLASSIFICATION_TEXT_SIZE = 60.0f;
     private static final float STROKE_WIDTH = 10.0f;
@@ -47,7 +51,7 @@ public class PoseGraphic extends GraphicOverlay.Graphic {
             return;
         }
 
-        // Draw pose classification text.
+        // Display name of exercise performed
         float classificationX = POSE_CLASSIFICATION_TEXT_SIZE * 0.5f;
             for (int i = 0; i < poseClassification.size(); i++) {
                 float classificationY =

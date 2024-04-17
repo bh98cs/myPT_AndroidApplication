@@ -45,6 +45,7 @@ import java.util.Locale;
 
 public class ViewProgressActivity extends AppCompatActivity implements View.OnClickListener {
 
+    //tag for class
     public static final String TAG = "ViewProgressActivity";
     private LineChart lineChart;
     private Spinner spinner_selectedExercise;
@@ -100,6 +101,10 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
 
     }
 
+    /**
+     * toggles whether the loading animation is displayed
+     * @param b boolean to indicate whether the loading animation should be displayed
+     */
     private void showLoadingGif(boolean b) {
         if(b){
             loadingGif.setVisibility(View.VISIBLE);
@@ -119,11 +124,15 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
                     lineChart.setVisibility(View.VISIBLE);
 
                 }
-            }, 2000);
+            }, 2000);//short delay so user can see loading icon (looks better than it disappearing straight away)
         }
 
     }
 
+    /**
+     * Check whether the user has been authenticated
+     * @param currentUser current firebase user
+     */
     private void checkLoggedIn(FirebaseUser currentUser) {
         //send user to homepage if not already logged in
         if(currentUser == null){
@@ -133,7 +142,9 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-
+    /**
+     * Loads names of exercises saved in the cloud into the spinner for the user to select from
+     */
     private void initList() {
         exerciseLogsRef.whereEqualTo("user", mAuth.getCurrentUser().getEmail())
                 .get()
@@ -173,6 +184,9 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
 
     }
 
+    /**
+     * Creates spinner from list of exercises saved to cloud
+     */
     private void setUpSpinner() {
         Log.i(TAG, "setUpSpinner: length = " + exercisesArray.length);
         if(exercisesArray.length == 0){
@@ -200,6 +214,9 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
+    /**
+     * Called when no exercise data has been saved to the cloud by the user. Updates the UI to indicate this
+     */
     private void noExerciseLogs() {
         CardView noLogsGif = findViewById(R.id.noLogsGif);
         showLoadingGif(false);
@@ -210,6 +227,10 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         noLogsGif.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Creates dataset for a line chart from most recent 6 entries of the selected
+     * exercise saved to the database.
+     */
     private void createLineChart() {
         //create list to hold data for visualisation
         ArrayList<Entry> dataset = new ArrayList<>();
@@ -260,6 +281,10 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
                 });
     }
 
+    /**
+     * Creates a line chart using the dataset given
+     * @param dataset data to be plotted within the line chart
+     */
     private void showChart(ArrayList<Entry> dataset) {
         lineDataSet.setValues(dataset);
         Log.d(TAG, "showChart: Create chart with values: " + dataset);
@@ -292,10 +317,20 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
         showLoadingGif(false);
     }
 
+    /**
+     * Caluculates the estimated one rep max according to Epley's equation
+     * @param weight the weight used for the exercise
+     * @param maxReps maximum number of reps performed for the exercise
+     * @return the estimated one rep max based on Epley's equation
+     */
     private int calculateOneRM(int weight, int maxReps) {
         //calculate estimated one rep max using Epley's equation
         return (int) ((0.033 * maxReps * weight) + weight);
     }
+
+    /**
+     * Logs the user out of their account
+     */
     private void logout() {
         //request confirmation to sign out
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewProgressActivity.this);

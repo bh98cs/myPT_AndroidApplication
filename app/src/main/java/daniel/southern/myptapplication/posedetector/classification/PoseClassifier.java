@@ -19,22 +19,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+/**
+ * Classifies {@link Pose} using the data given in {@link PoseSample}.
+ * Uses K-nearest neighbour to classify poses
+ */
 public class PoseClassifier {
-    private static final String TAG = "PoseClassifier";
+    // values for calculating K-nearest neighbour
     private static final int MAX_DISTANCE_TOP_K = 30;
     private static final int MEAN_DISTANCE_TOP_K = 10;
-    // Note Z has a lower weight as it is generally less accurate than X & Y.
+    // weightings for axis. Z given a weight of 0
     private static final PointF3D AXES_WEIGHTS = PointF3D.from(1, 1, 0);
 
+    //list of poses provided in the dataset
     private final List<PoseSample> poseSamples;
     private final int maxDistanceTopK;
     private final int meanDistanceTopK;
     private final PointF3D axesWeights;
 
+    /**
+     * {@link PoseClassifier} class constructor
+     * @param poseSamples list of poses recognised
+     */
     public PoseClassifier(List<PoseSample> poseSamples) {
         this(poseSamples, MAX_DISTANCE_TOP_K, MEAN_DISTANCE_TOP_K, AXES_WEIGHTS);
     }
 
+    /**
+     *
+     * @param poseSamples list of poses recognised
+     * @param maxDistanceTopK (used for pose classification)
+     * @param meanDistanceTopK (used for pose classification)
+     * @param axesWeights weightings for axis
+     */
     public PoseClassifier(List<PoseSample> poseSamples, int maxDistanceTopK,
                           int meanDistanceTopK, PointF3D axesWeights) {
         this.poseSamples = poseSamples;
@@ -43,6 +59,11 @@ public class PoseClassifier {
         this.axesWeights = axesWeights;
     }
 
+    /**
+     * Retrieves a list of all pose landmarks from a {@link Pose}
+     * @param pose the pose which all landmarks are to be retrieved for
+     * @return a list of all landmarks within the detected pose
+     */
     private static List<PointF3D> extractPoseLandmarks(Pose pose) {
         List<PointF3D> landmarks = new ArrayList<>();
         for (PoseLandmark poseLandmark : pose.getAllPoseLandmarks()) {
@@ -51,42 +72,31 @@ public class PoseClassifier {
         return landmarks;
     }
 
-    /**
-     * Returns the max range of confidence values.
-     *
-     * <p><Since we calculate confidence by counting {@link PoseSample}s that survived
-     * outlier-filtering by maxDistanceTopK and meanDistanceTopK, this range is the minimum of two.
-     */
-    public int confidenceRange() {
-        return min(maxDistanceTopK, meanDistanceTopK);
-    }
-
     public ClassificationResult classify(Pose pose) {
         return classify(extractPoseLandmarks(pose));
     }
 
+    /**
+     * Classification based on a list of landmarks of the human body using K nearest neighbour
+     * @param landmarks list of landmarks for the body
+     * @return {@link ClassificationResult} which includes the most confidently identified exercise
+      */
     public ClassificationResult classify(List<PointF3D> landmarks) {
         ClassificationResult result = new ClassificationResult();
-        // Return early if no landmarks detected.
+        // Return no landmarks detected.
         if (landmarks.isEmpty()) {
             return result;
         }
 
-        // We do flipping on X-axis so we are horizontal (mirror) invariant.
+        // We do flipping on X-axis to ensure is mirror invariant.
         List<PointF3D> flippedLandmarks = new ArrayList<>(landmarks);
         multiplyAll(flippedLandmarks, PointF3D.from(-1, 1, 1));
 
         List<PointF3D> embedding = getPoseEmbedding(landmarks);
         List<PointF3D> flippedEmbedding = getPoseEmbedding(flippedLandmarks);
 
-
-        // Classification is done in two stages:
-        //  * First we pick top-K samples by MAX distance. It allows to remove samples that are almost
-        //    the same as given pose, but maybe has few joints bent in the other direction.
-        //  * Then we pick top-K samples by MEAN distance. After outliers are removed, we pick samples
-        //    that are closest by average.
-
-        // Keeps max distance on top so we can pop it when top_k size is reached.
+        // pick top-K samples by max distance
+        // Keeps max distance on top to pop it when top_k size is reached.
         PriorityQueue<Pair<PoseSample, Float>> maxDistances = new PriorityQueue<>(
                 maxDistanceTopK, (o1, o2) -> -Float.compare(o1.second, o2.second));
         // Retrieve top K poseSamples by least distance to remove outliers.
@@ -109,16 +119,17 @@ public class PoseClassifier {
             }
             // Set the max distance as min of original and flipped max distance.
             maxDistances.add(new Pair<>(poseSample, min(originalMax, flippedMax)));
-            // We only want to retain top n so pop the highest distance.
+            // pop the highest distance to retain top n
             if (maxDistances.size() > maxDistanceTopK) {
                 maxDistances.poll();
             }
         }
 
-        // Keeps higher mean distances on top so we can pop it when top_k size is reached.
+        // pick top-K samples by mean distance
+        // Keeps higher mean distances on top to pop it when top_k size is reached.
         PriorityQueue<Pair<PoseSample, Float>> meanDistances = new PriorityQueue<>(
                 meanDistanceTopK, (o1, o2) -> -Float.compare(o1.second, o2.second));
-        // Retrive top K poseSamples by least mean distance to remove outliers.
+        // Retrieve top K poseSamples by least mean distance to remove outliers.
         for (Pair<PoseSample, Float> sampleDistances : maxDistances) {
             PoseSample poseSample = sampleDistances.first;
             List<PointF3D> sampleEmbedding = poseSample.getEmbedding();
@@ -134,7 +145,7 @@ public class PoseClassifier {
             // Set the mean distance as min of original and flipped mean distances.
             float meanDistance = min(originalSum, flippedSum) / (embedding.size() * 2);
             meanDistances.add(new Pair<>(poseSample, meanDistance));
-            // We only want to retain top k so pop the highest mean distance.
+            // retain top k to pop the highest mean distance.
             if (meanDistances.size() > meanDistanceTopK) {
                 meanDistances.poll();
             }
