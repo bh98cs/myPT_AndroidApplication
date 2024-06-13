@@ -318,7 +318,7 @@ public class ViewProgressActivity extends AppCompatActivity implements View.OnCl
     }
 
     /**
-     * Caluculates the estimated one rep max according to Epley's equation
+     * Calculates the estimated one rep max according to Epley's equation
      * @param weight the weight used for the exercise
      * @param maxReps maximum number of reps performed for the exercise
      * @return the estimated one rep max based on Epley's equation
